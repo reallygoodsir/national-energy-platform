@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>National Energy Platform</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- LEFT SIDE (branding / empty visual area) -->
+    <div class="left-panel">
+        <h1>National Energy Platform</h1>
+        <p>Secure access portal</p>
+    </div>
+
+    <!-- RIGHT SIDE (auth panel) -->
+    <div class="right-panel">
+
+        <div class="tabs">
+            <button onclick="showLogin()" id="loginTab" class="active">Login</button>
+            <button onclick="showSignup()" id="signupTab">Register</button>
+        </div>
+
+        <!-- LOGIN -->
+        <div id="loginForm" class="form">
+
+            <input type="email" id="loginEmail" placeholder="Email">
+            <input type="password" id="loginPassword" placeholder="Password">
+
+            <button onclick="login()">Login</button>
+
+            <div id="loginError" class="error"></div>
+        </div>
+
+        <!-- SIGNUP -->
+        <div id="signupForm" class="form hidden">
+
+            <input type="text" id="signupName" placeholder="Full Name">
+            <input type="email" id="signupEmail" placeholder="Email">
+            <input type="text" id="signupPhone" placeholder="Phone Number">
+            <input type="password" id="signupPassword" placeholder="Password">
+
+            <button onclick="signup()">Register</button>
+
+            <div id="signupError" class="error"></div>
+        </div>
+
+    </div>
+</div>
+
+<!-- SUCCESS SCREEN -->
+<div id="successScreen" class="success hidden">
+    <h1>UNDER MAINTENANCE</h1>
+    <p>You are successfully logged in.</p>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
