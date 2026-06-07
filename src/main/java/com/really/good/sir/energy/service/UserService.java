@@ -1,11 +1,13 @@
 package com.really.good.sir.energy.service;
 
-import com.really.good.sir.energy.dto.request.AssignRoleRequest;
+import com.really.good.sir.energy.dto.request.RoleRequest;
 import com.really.good.sir.energy.dto.response.RoleResponse;
 import com.really.good.sir.energy.dto.response.SearchUserResponse;
 import com.really.good.sir.energy.entity.RoleEntity;
 import com.really.good.sir.energy.entity.UserEntity;
 import com.really.good.sir.energy.exception.RoleAlreadyAssignedException;
+import com.really.good.sir.energy.exception.RoleNotAssignedException;
+import com.really.good.sir.energy.exception.RoleNotFoundException;
 import com.really.good.sir.energy.exception.UserNotFoundException;
 import com.really.good.sir.energy.mapper.RoleMapper;
 import com.really.good.sir.energy.mapper.UserMapper;
@@ -54,7 +56,7 @@ public class UserService {
         );
     }
 
-    public void assignRole(AssignRoleRequest request) {
+    public void assignRole(RoleRequest request) {
 
         UserEntity user = userRepository.findById(request.getUserId())
                 .orElseThrow(() ->
@@ -70,6 +72,23 @@ public class UserService {
         }
 
         user.getRoles().add(role);
+
+        userRepository.save(user);
+    }
+
+    public void removeRole(RoleRequest request) {
+
+        UserEntity user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        RoleEntity role = roleRepository.findById(request.getRoleId())
+                .orElseThrow(() -> new RoleNotFoundException("Role not found"));
+
+        if (!user.getRoles().contains(role)) {
+            throw new RoleNotAssignedException("Role is not assigned to user");
+        }
+
+        user.getRoles().remove(role);
 
         userRepository.save(user);
     }

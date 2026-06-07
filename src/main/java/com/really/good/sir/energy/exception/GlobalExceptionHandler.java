@@ -3,7 +3,6 @@ package com.really.good.sir.energy.exception;
 import com.really.good.sir.energy.dto.response.ErrorResponse;
 import com.really.good.sir.energy.dto.response.ValidationErrorResponse;
 
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;

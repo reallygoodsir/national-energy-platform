@@ -1,6 +1,6 @@
 package com.really.good.sir.energy.controller;
 
-import com.really.good.sir.energy.dto.request.AssignRoleRequest;
+import com.really.good.sir.energy.dto.request.RoleRequest;
 import com.really.good.sir.energy.dto.response.SearchUserResponse;
 import com.really.good.sir.energy.service.UserService;
 import jakarta.validation.Valid;
@@ -21,11 +21,13 @@ public class UserController {
         return userService.search(value);
     }
 
-    @PostMapping("/assign")
-    public void assignRole(
-            @Valid
-            @RequestBody AssignRoleRequest request) {
-
+    @PostMapping("/role")
+    public void assignRole(@Valid @RequestBody RoleRequest request) {
         userService.assignRole(request);
+    }
+
+    @DeleteMapping("/role")
+    public void removeRole(@Valid @RequestBody RoleRequest request) {
+        userService.removeRole(request);
     }
 }
