@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Roles</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background: #f2f2f2;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>All Roles</h2>
+
+    <div id="errorBox" class="error"></div>
+
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Description</th>
+        </tr>
+        </thead>
+
+        <tbody id="rolesTable"></tbody>
+    </table>
+
+</div>
+
+<script>
+
+    async function loadRoles() {
+
+        const res = await fetch("/api/roles");
+
+        if (!res.ok) {
+            document.getElementById("errorBox").innerText = "Failed to load roles";
+            return;
+        }
+
+        const data = await res.json();
+
+        const table = document.getElementById("rolesTable");
+        table.innerHTML = "";
+
+        data.forEach(role => {
+
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+                <td>${role.id}</td>
+                <td>${role.name}</td>
+                <td>${role.description || ""}</td>
+            `;
+
+            table.appendChild(row);
+        });
+    }
+
+    loadRoles();
+
+</script>
+
+</body>
+</html>

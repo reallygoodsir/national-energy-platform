@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Role Management</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        .box {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .roles {
+            margin-top: 10px;
+        }
+
+        .role {
+            display: inline-block;
+            background: #eee;
+            padding: 5px 10px;
+            margin: 5px;
+            border-radius: 5px;
+        }
+
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+
+        .success {
+            color: green;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>Role Management</h2>
+
+    <!-- SEARCH -->
+    <input type="text" id="searchInput" placeholder="Enter email or phone">
+    <button onclick="searchUser()">Search User</button>
+
+    <div id="errorBox" class="error"></div>
+
+    <!-- USER INFO -->
+    <div id="userBox" class="box" style="display:none">
+
+        <h3 id="userName"></h3>
+
+        <div>
+            <strong>Assigned Roles:</strong>
+            <div id="assignedRoles" class="roles"></div>
+        </div>
+
+        <hr>
+
+        <!-- ASSIGN ROLE -->
+        <div>
+            <strong>Assign New Role:</strong>
+
+            <select id="roleSelect"></select>
+
+            <button onclick="assignRole()">Assign Role</button>
+
+            <div id="assignMessage"></div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+
+    let currentUserId = null;
+    let availableRoles = [];
+
+    /* ---------------- SEARCH USER ---------------- */
+    async function searchUser() {
+
+        const value = document.getElementById("searchInput").value;
+
+        document.getElementById("errorBox").innerText = "";
+        document.getElementById("assignMessage").innerText = "";
+
+        const res = await fetch(`/api/roles/users/search?value=${value}`);
+
+        if (!res.ok) {
+            document.getElementById("userBox").style.display = "none";
+            document.getElementById("errorBox").innerText = "User not found";
+            return;
+        }
+
+        const data = await res.json();
+
+        currentUserId = data.userId;
+        availableRoles = data.availableRoles;
+
+        // show user box
+        document.getElementById("userBox").style.display = "block";
+
+        // name
+        document.getElementById("userName").innerText = data.fullName;
+
+        // assigned roles
+        const assignedDiv = document.getElementById("assignedRoles");
+        assignedDiv.innerHTML = "";
+
+        data.assignedRoles.forEach(role => {
+            const span = document.createElement("span");
+            span.className = "role";
+            span.innerText = role.name;
+            assignedDiv.appendChild(span);
+        });
+
+        // dropdown
+        const select = document.getElementById("roleSelect");
+        select.innerHTML = "";
+
+        data.availableRoles.forEach(role => {
+            const option = document.createElement("option");
+            option.value = role.id;
+            option.text = role.name;
+            select.appendChild(option);
+        });
+    }
+
+    /* ---------------- ASSIGN ROLE ---------------- */
+    async function assignRole() {
+
+        const roleId = document.getElementById("roleSelect").value;
+
+        const res = await fetch("/api/roles/assign", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                userId: currentUserId,
+                roleId: roleId
+            })
+        });
+
+        const msgBox = document.getElementById("assignMessage");
+
+        if (!res.ok) {
+            msgBox.style.color = "red";
+            msgBox.innerText = "Failed to assign role";
+            return;
+        }
+
+        msgBox.style.color = "green";
+        msgBox.innerText = "Role assigned successfully";
+
+        // refresh user data
+        searchUser();
+    }
+
+</script>
+
+</body>
+</html>
