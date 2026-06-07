@@ -1,65 +1,76 @@
 package com.really.good.sir.energy.service;
 
-import com.really.good.sir.energy.dto.request.LoginRequest;
-import com.really.good.sir.energy.dto.request.SignupRequest;
-import com.really.good.sir.energy.dto.response.LoginResponse;
-import com.really.good.sir.energy.dto.response.SignupResponse;
+import com.really.good.sir.energy.dto.request.AssignRoleRequest;
+import com.really.good.sir.energy.dto.response.RoleResponse;
+import com.really.good.sir.energy.dto.response.SearchUserResponse;
 import com.really.good.sir.energy.entity.RoleEntity;
 import com.really.good.sir.energy.entity.UserEntity;
-import com.really.good.sir.energy.exception.EmailAlreadyExistsException;
-import com.really.good.sir.energy.exception.InvalidCredentialsException;
-import com.really.good.sir.energy.exception.PhoneNumberAlreadyExistsException;
+import com.really.good.sir.energy.exception.RoleAlreadyAssignedException;
+import com.really.good.sir.energy.exception.UserNotFoundException;
+import com.really.good.sir.energy.mapper.RoleMapper;
 import com.really.good.sir.energy.mapper.UserMapper;
 import com.really.good.sir.energy.repository.RoleRepository;
 import com.really.good.sir.energy.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
-    private final UserMapper userMapper;
     private final RoleRepository roleRepository;
+    private final UserMapper userMapper;
+    private final RoleMapper roleMapper;
 
-    public UserService(UserRepository userRepository, UserMapper userMapper, RoleRepository roleRepository) {
+    public UserService(UserRepository userRepository, RoleRepository roleRepository, UserMapper userMapper, RoleMapper roleMapper) {
         this.userRepository = userRepository;
-        this.userMapper = userMapper;
         this.roleRepository = roleRepository;
+        this.userMapper = userMapper;
+        this.roleMapper = roleMapper;
     }
 
-    public SignupResponse signup(SignupRequest request) {
+    public SearchUserResponse search(String searchValue) {
+        UserEntity user = userRepository.findByEmail(searchValue)
+                .or(() -> userRepository.findByPhoneNumber(searchValue))
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new EmailAlreadyExistsException("Email already exists");
-        }
+        List<RoleResponse> assignedRoles = user.getRoles()
+                .stream()
+                .map(roleMapper::toRoleResponse)
+                .collect(Collectors.toList());
 
-        if (userRepository.existsByPhoneNumber(request.getPhoneNumber())) {
-            throw new PhoneNumberAlreadyExistsException("Phone number already exists");
-        }
+        List<RoleResponse> availableRoles = roleRepository.findAll()
+                .stream()
+                .filter(role -> !user.getRoles().contains(role))
+                .map(roleMapper::toRoleResponse)
+                .collect(Collectors.toList());
 
-        UserEntity userEntity = userMapper.toEntity(request);
-
-        RoleEntity consumerRole = roleRepository.findByName("CONSUMER")
-                .orElseThrow(() ->
-                        new RuntimeException("CONSUMER role not found"));
-
-        userEntity.getRoles().add(consumerRole);
-
-        UserEntity savedUserEntity = userRepository.save(userEntity);
-
-        return userMapper.toSignupResponse(savedUserEntity);
+        return userMapper.toSearchUserResponse(
+                user,
+                assignedRoles,
+                availableRoles
+        );
     }
 
-    public LoginResponse login(LoginRequest request) {
+    public void assignRole(AssignRoleRequest request) {
 
-        UserEntity userEntity = userRepository.findByEmail(request.getEmail())
+        UserEntity user = userRepository.findById(request.getUserId())
                 .orElseThrow(() ->
-                        new InvalidCredentialsException("Invalid email or password"));
+                        new UserNotFoundException("User not found"));
 
-        if (!userEntity.getPassword().equals(request.getPassword())) {
-            throw new InvalidCredentialsException("Invalid email or password");
+        RoleEntity role = roleRepository.findById(request.getRoleId())
+                .orElseThrow(() ->
+                        new RuntimeException("Role not found"));
+
+        if (user.getRoles().contains(role)) {
+            throw new RoleAlreadyAssignedException(
+                    "Role already assigned");
         }
 
-        return userMapper.toLoginResponse(userEntity);
+        user.getRoles().add(role);
+
+        userRepository.save(user);
     }
 }

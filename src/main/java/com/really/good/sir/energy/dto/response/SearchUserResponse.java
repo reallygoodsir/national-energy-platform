@@ -6,8 +6,8 @@ public class SearchUserResponse {
 
     private Long userId;
     private String fullName;
-    private List<RoleDto> assignedRoles;
-    private List<RoleDto> availableRoles;
+    private List<RoleResponse> assignedRoles;
+    private List<RoleResponse> availableRoles;
 
     public SearchUserResponse() {
     }
@@ -15,8 +15,8 @@ public class SearchUserResponse {
     public SearchUserResponse(
             Long userId,
             String fullName,
-            List<RoleDto> assignedRoles,
-            List<RoleDto> availableRoles) {
+            List<RoleResponse> assignedRoles,
+            List<RoleResponse> availableRoles) {
 
         this.userId = userId;
         this.fullName = fullName;
@@ -32,11 +32,11 @@ public class SearchUserResponse {
         return fullName;
     }
 
-    public List<RoleDto> getAssignedRoles() {
+    public List<RoleResponse> getAssignedRoles() {
         return assignedRoles;
     }
 
-    public List<RoleDto> getAvailableRoles() {
+    public List<RoleResponse> getAvailableRoles() {
         return availableRoles;
     }
 
@@ -48,11 +48,11 @@ public class SearchUserResponse {
         this.fullName = fullName;
     }
 
-    public void setAssignedRoles(List<RoleDto> assignedRoles) {
+    public void setAssignedRoles(List<RoleResponse> assignedRoles) {
         this.assignedRoles = assignedRoles;
     }
 
-    public void setAvailableRoles(List<RoleDto> availableRoles) {
+    public void setAvailableRoles(List<RoleResponse> availableRoles) {
         this.availableRoles = availableRoles;
     }
 }

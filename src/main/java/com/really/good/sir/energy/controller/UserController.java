@@ -1,18 +1,13 @@
 package com.really.good.sir.energy.controller;
 
-import com.really.good.sir.energy.dto.request.LoginRequest;
-import com.really.good.sir.energy.dto.request.SignupRequest;
-import com.really.good.sir.energy.dto.response.LoginResponse;
-import com.really.good.sir.energy.dto.response.SignupResponse;
+import com.really.good.sir.energy.dto.request.AssignRoleRequest;
+import com.really.good.sir.energy.dto.response.SearchUserResponse;
 import com.really.good.sir.energy.service.UserService;
-
 import jakarta.validation.Valid;
-
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/users")
 public class UserController {
 
     private final UserService userService;
@@ -21,14 +16,16 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("/signup")
-    @ResponseStatus(HttpStatus.CREATED)
-    public SignupResponse signup(@Valid @RequestBody SignupRequest request) {
-        return userService.signup(request);
+    @GetMapping("/search")
+    public SearchUserResponse search(@RequestParam String value) {
+        return userService.search(value);
     }
 
-    @PostMapping("/login")
-    public LoginResponse login(@Valid @RequestBody LoginRequest request) {
-        return userService.login(request);
+    @PostMapping("/assign")
+    public void assignRole(
+            @Valid
+            @RequestBody AssignRoleRequest request) {
+
+        userService.assignRole(request);
     }
 }

@@ -1,11 +1,8 @@
 package com.really.good.sir.energy.mapper;
 
 import com.really.good.sir.energy.dto.request.SignupRequest;
-import com.really.good.sir.energy.dto.response.LoginResponse;
-import com.really.good.sir.energy.dto.response.RoleDto;
+import com.really.good.sir.energy.dto.response.RoleResponse;
 import com.really.good.sir.energy.dto.response.SearchUserResponse;
-import com.really.good.sir.energy.dto.response.SignupResponse;
-import com.really.good.sir.energy.entity.RoleEntity;
 import com.really.good.sir.energy.entity.UserEntity;
 import org.springframework.stereotype.Service;
 
@@ -27,37 +24,10 @@ public class UserMapper {
         return user;
     }
 
-    public SignupResponse toSignupResponse(UserEntity userEntity) {
-
-        return new SignupResponse(
-                userEntity.getId(),
-                userEntity.getFullName(),
-                userEntity.getEmail()
-        );
-    }
-
-    public LoginResponse toLoginResponse(UserEntity userEntity) {
-
-        return new LoginResponse(
-                userEntity.getId(),
-                userEntity.getFullName(),
-                userEntity.getEmail()
-        );
-    }
-
-    public RoleDto toRoleDto(RoleEntity role) {
-
-        return new RoleDto(
-                role.getId(),
-                role.getName(),
-                role.getDescription()
-        );
-    }
-
     public SearchUserResponse toSearchUserResponse(
             UserEntity user,
-            List<RoleDto> assignedRoles,
-            List<RoleDto> availableRoles) {
+            List<RoleResponse> assignedRoles,
+            List<RoleResponse> availableRoles) {
 
         return new SearchUserResponse(
                 user.getId(),

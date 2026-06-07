@@ -1,15 +1,15 @@
 package com.really.good.sir.energy.dto.response;
 
-public class RoleDto {
+public class RoleResponse {
 
     private Long id;
     private String name;
     private String description;
 
-    public RoleDto() {
+    public RoleResponse() {
     }
 
-    public RoleDto(Long id, String name, String description) {
+    public RoleResponse(Long id, String name, String description) {
         this.id = id;
         this.name = name;
         this.description = description;
