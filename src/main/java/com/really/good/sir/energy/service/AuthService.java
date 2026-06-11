@@ -13,6 +13,12 @@ import com.really.good.sir.energy.mapper.AuthMapper;
 import com.really.good.sir.energy.mapper.UserMapper;
 import com.really.good.sir.energy.repository.RoleRepository;
 import com.really.good.sir.energy.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,8 +29,11 @@ public class AuthService {
     private final AuthMapper authMapper;
     private final UserMapper userMapper;
 
-    public AuthService(UserRepository userRepository, RoleRepository roleRepository,
-                       AuthMapper authMapper, UserMapper userMapper) {
+    public AuthService(UserRepository userRepository,
+                       RoleRepository roleRepository,
+                       AuthMapper authMapper,
+                       UserMapper userMapper) {
+
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.authMapper = authMapper;
@@ -54,7 +63,7 @@ public class AuthService {
         return authMapper.toSignupResponse(savedUserEntity);
     }
 
-    public LoginResponse login(LoginRequest request) {
+    public LoginResponse login(LoginRequest request, HttpServletRequest httpRequest) {
 
         UserEntity userEntity = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() ->
@@ -63,6 +72,29 @@ public class AuthService {
         if (!userEntity.getPassword().equals(request.getPassword())) {
             throw new InvalidCredentialsException("Invalid email or password");
         }
+
+        var authorities = userEntity.getRoles()
+                .stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
+                .toList();
+
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(
+                        userEntity.getEmail(),
+                        null,
+                        authorities
+                );
+
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(authentication);
+
+        SecurityContextHolder.setContext(context);
+
+        httpRequest.getSession(true)
+                .setAttribute(
+                        HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+                        context
+                );
 
         return authMapper.toLoginResponse(userEntity);
     }

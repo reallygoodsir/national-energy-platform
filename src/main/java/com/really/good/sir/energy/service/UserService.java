@@ -92,4 +92,9 @@ public class UserService {
 
         userRepository.save(user);
     }
+
+    public UserEntity findByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+    }
 }

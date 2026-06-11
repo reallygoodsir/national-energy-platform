@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Maintenance</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            background: #0f172a;
+            color: white;
+        }
+
+        /* MAIN LAYOUT */
+        .app {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* LEFT MENU */
+        .side-menu {
+            width: 180px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #0b1220;
+            border-right: 1px solid #1f2937;
+        }
+
+        .menu-item {
+            cursor: pointer;
+            color: #cbd5e1;
+            font-size: 14px;
+            padding: 8px 10px;
+            border-radius: 4px;
+            transition: 0.2s ease;
+            user-select: none;
+        }
+
+        .menu-item:hover {
+            background: #1f2937;
+            color: white;
+        }
+
+        .menu-item.logout {
+            color: #f87171;
+        }
+
+        .menu-item.logout:hover {
+            background: #3b1f1f;
+        }
+
+        /* RIGHT CONTENT AREA */
+        .content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        /* INPUT FIX */
+        input {
+            margin: 8px 0;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            width: 100%;
+            max-width: 340px;
+        }
+
+        select {
+            margin: 8px 0;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            width: 100%;
+            max-width: 340px;
+        }
+
+        button {
+            padding: 10px 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            background: #3b82f6;
+            color: white;
+            width: fit-content;
+            max-width: 220px;
+        }
+
+        button:hover {
+            background: #2563eb;
+        }
+
+        .box {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #1f2937;
+            border-radius: 6px;
+            background: #0b1220;
+            max-width: 500px;
+        }
+
+        .roles {
+            margin-top: 10px;
+        }
+
+        .role {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #1f2937;
+            padding: 5px 10px;
+            margin: 5px;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+
+        .remove-role {
+            cursor: pointer;
+            color: #f87171;
+            font-weight: bold;
+        }
+
+        .error { color: #f87171; margin-top: 10px; }
+        .success { color: #34d399; margin-top: 10px; }
+        .muted { color: #94a3b8; font-size: 13px; margin-top: 5px; }
+
+        .hidden { display: none; }
+
+        .section-title {
+            margin-top: 20px;
+            margin-bottom: 10px;
+            color: #cbd5e1;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- LEFT MENU -->
+    <div class="side-menu">
+        <div class="menu-item logout" onclick="logout()">Logout</div>
+        <div class="menu-item" onclick="showRoles()">User Roles</div>
+    </div>
+
+    <!-- RIGHT CONTENT -->
+    <div class="content">
+
+        <!-- DEFAULT STATE -->
+        <div id="homeState">
+            <h2>Welcome</h2>
+            <p>Select a menu option.</p>
+        </div>
+
+        <!-- USER ROLES PANEL -->
+        <div id="rolesPanel" class="hidden">
+
+            <h2>User Search</h2>
+
+            <input type="text" id="searchInput" placeholder="Enter email or phone">
+
+            <button onclick="searchUser()">Search User</button>
+
+            <div id="errorBox" class="error"></div>
+
+            <div id="userBox" class="box hidden">
+
+                <h3 id="userName"></h3>
+
+                <div class="section-title">Assigned Roles</div>
+                <div id="assignedRoles" class="roles"></div>
+
+                <div class="section-title">Assign New Role</div>
+
+                <select id="roleSelect"></select>
+
+                <div id="noRolesMsg" class="muted hidden">
+                    No available roles
+                </div>
+
+                <button onclick="assignRole()">Assign Role</button>
+
+                <div id="assignMessage"></div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<script>
+
+    let currentUserId = null;
+
+    function showRoles() {
+        document.getElementById("homeState").classList.add("hidden");
+        document.getElementById("rolesPanel").classList.remove("hidden");
+    }
+
+    async function logout() {
+        await fetch("/national-energy-platform/api/auth/logout", {
+            method: "POST",
+            credentials: "include"
+        });
+
+        window.location.href = "/national-energy-platform/index.html";
+    }
+
+    async function searchUser() {
+
+        const value = document.getElementById("searchInput").value;
+
+        const res = await fetch(
+            `/national-energy-platform/api/users/search?value=${value}`
+        );
+
+        if (!res.ok) {
+            document.getElementById("userBox").classList.add("hidden");
+            document.getElementById("errorBox").innerText = "User not found";
+            return;
+        }
+
+        const data = await res.json();
+
+        currentUserId = data.userId;
+
+        document.getElementById("userBox").classList.remove("hidden");
+        document.getElementById("userName").innerText = data.fullName;
+
+        const assignedDiv = document.getElementById("assignedRoles");
+        assignedDiv.innerHTML = "";
+
+        data.assignedRoles.forEach(role => {
+            const span = document.createElement("span");
+            span.className = "role";
+            span.innerHTML = `${role.name}
+                <span class="remove-role" onclick="removeRole(${role.id})">x</span>`;
+            assignedDiv.appendChild(span);
+        });
+
+        const select = document.getElementById("roleSelect");
+        select.innerHTML = "";
+
+        if (!data.availableRoles || data.availableRoles.length === 0) {
+            select.classList.add("hidden");
+            document.getElementById("noRolesMsg").classList.remove("hidden");
+        } else {
+            select.classList.remove("hidden");
+            document.getElementById("noRolesMsg").classList.add("hidden");
+
+            data.availableRoles.forEach(role => {
+                const option = document.createElement("option");
+                option.value = role.id;
+                option.text = role.name;
+                select.appendChild(option);
+            });
+        }
+    }
+
+    async function assignRole() {
+
+        const roleId = document.getElementById("roleSelect").value;
+
+        const res = await fetch("/national-energy-platform/api/users/role", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                userId: currentUserId,
+                roleId: Number(roleId)
+            })
+        });
+
+        document.getElementById("assignMessage").innerText =
+            res.ok ? "Role assigned successfully" : "Failed to assign role";
+
+        searchUser();
+    }
+
+    async function removeRole(roleId) {
+
+        const res = await fetch("/national-energy-platform/api/users/role", {
+            method: "DELETE",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                userId: currentUserId,
+                roleId: roleId
+            })
+        });
+
+        document.getElementById("assignMessage").innerText =
+            res.ok ? "Role removed successfully" : "Failed to remove role";
+
+        searchUser();
+    }
+
+</script>
+
+</body>
+</html>

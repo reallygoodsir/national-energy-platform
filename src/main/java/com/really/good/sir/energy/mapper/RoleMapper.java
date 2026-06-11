@@ -8,6 +8,7 @@ import java.util.List;
 
 @Service
 public class RoleMapper {
+
     public RoleResponse toRoleResponse(RoleEntity role) {
         return new RoleResponse(
                 role.getId(),

@@ -3,20 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <title>National Energy Platform</title>
-    <link rel="stylesheet" href="styles.css">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            background: #0f172a;
+            color: white;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .left-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 60px;
+            background: #0b1220;
+        }
+
+        .right-panel {
+            width: 400px;
+            background: #111827;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .tabs button {
+            flex: 1;
+            padding: 10px;
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+
+        .tabs .active {
+            border-bottom: 2px solid #3b82f6;
+        }
+
+        .form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        input {
+            margin: 8px 0;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 10px;
+            background: #3b82f6;
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+
+        .error {
+            color: #f87171;
+            margin-top: 10px;
+        }
+
+        /* ===== OVERLAY FIX ===== */
+        .role-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            display: none; /* IMPORTANT: default hidden */
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .role-box {
+            background: #111827;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 300px;
+        }
+
+        .role-btn {
+            display: block;
+            width: 100%;
+            margin-top: 10px;
+            padding: 12px;
+            background: #3b82f6;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+
+        .role-btn:hover {
+            background: #2563eb;
+        }
+    </style>
 </head>
 
 <body>
 
 <div class="container">
 
-    <!-- LEFT SIDE (branding / empty visual area) -->
     <div class="left-panel">
         <h1>National Energy Platform</h1>
         <p>Secure access portal</p>
     </div>
 
-    <!-- RIGHT SIDE (auth panel) -->
     <div class="right-panel">
 
         <div class="tabs">
@@ -24,39 +134,162 @@
             <button onclick="showSignup()" id="signupTab">Register</button>
         </div>
 
-        <!-- LOGIN -->
         <div id="loginForm" class="form">
-
             <input type="email" id="loginEmail" placeholder="Email">
             <input type="password" id="loginPassword" placeholder="Password">
-
             <button onclick="login()">Login</button>
-
             <div id="loginError" class="error"></div>
         </div>
 
-        <!-- SIGNUP -->
         <div id="signupForm" class="form hidden">
-
             <input type="text" id="signupName" placeholder="Full Name">
             <input type="email" id="signupEmail" placeholder="Email">
             <input type="text" id="signupPhone" placeholder="Phone Number">
             <input type="password" id="signupPassword" placeholder="Password">
-
             <button onclick="signup()">Register</button>
-
             <div id="signupError" class="error"></div>
         </div>
 
     </div>
 </div>
 
-<!-- SUCCESS SCREEN -->
-<div id="successScreen" class="success hidden">
-    <h1>UNDER MAINTENANCE</h1>
-    <p>You are successfully logged in.</p>
+<!-- ROLE OVERLAY -->
+<div id="roleOverlay" class="role-overlay">
+    <div class="role-box">
+        <h2>Choose your role</h2>
+        <p>You have multiple roles assigned</p>
+        <div id="roleButtons"></div>
+    </div>
 </div>
 
-<script src="app.js"></script>
+<script>
+    const BASE = "/national-energy-platform";
+
+    // ---------- INITIAL STATE ----------
+    window.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("roleOverlay").style.display = "none";
+
+        // force deterministic UI state
+        showLogin();
+    });
+
+    // ---------- TAB UI ----------
+    function showLogin() {
+        document.getElementById("loginForm").style.display = "flex";
+        document.getElementById("signupForm").style.display = "none";
+
+        document.getElementById("loginTab").classList.add("active");
+        document.getElementById("signupTab").classList.remove("active");
+    }
+
+    function showSignup() {
+        document.getElementById("signupForm").style.display = "flex";
+        document.getElementById("loginForm").style.display = "none";
+
+        document.getElementById("signupTab").classList.add("active");
+        document.getElementById("loginTab").classList.remove("active");
+    }
+
+    // ---------- LOGIN ----------
+    async function login() {
+
+        const email = document.getElementById("loginEmail").value;
+        const password = document.getElementById("loginPassword").value;
+
+        const res = await fetch(`${BASE}/api/auth/login`, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            credentials: "include",
+            body: JSON.stringify({ email, password })
+        });
+
+        if (!res.ok) {
+            const data = await res.json();
+            document.getElementById("loginError").innerText =
+                data.message || "Invalid login";
+            return;
+        }
+
+        const meRes = await fetch(`${BASE}/api/users/current`, {
+            method: "GET",
+            credentials: "include"
+        });
+
+        const me = await meRes.json();
+
+        handleRoles(me.roles);
+    }
+
+    // ---------- ROLE LOGIC ----------
+    function handleRoles(roles) {
+
+        const roleMap = {
+            ADMIN: "/admin.html",
+            CONSUMER: "/consumer.html"
+        };
+
+        roles = roles || [];
+
+        if (roles.length === 1) {
+            window.location.href = BASE + roleMap[roles[0]];
+            return;
+        }
+
+        showRolePicker(roles, roleMap);
+    }
+
+    // ---------- ROLE OVERLAY ----------
+    function showRolePicker(roles, roleMap) {
+
+        const overlay = document.getElementById("roleOverlay");
+        const container = document.getElementById("roleButtons");
+
+        container.innerHTML = "";
+
+        roles.forEach(role => {
+            const btn = document.createElement("button");
+            btn.className = "role-btn";
+            btn.innerText = role;
+
+            btn.onclick = () => {
+                window.location.href = BASE + roleMap[role];
+            };
+
+            container.appendChild(btn);
+        });
+
+        overlay.style.display = "flex";
+    }
+
+    // ---------- SIGNUP ----------
+    async function signup() {
+
+        const fullName = document.getElementById("signupName").value;
+        const email = document.getElementById("signupEmail").value;
+        const phoneNumber = document.getElementById("signupPhone").value;
+        const password = document.getElementById("signupPassword").value;
+
+        const res = await fetch(`${BASE}/api/auth/signup`, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                fullName,
+                email,
+                phoneNumber,
+                password
+            })
+        });
+
+        if (!res.ok) {
+            const data = await res.json();
+            document.getElementById("signupError").innerText =
+                data.message || "Signup failed";
+            return;
+        }
+
+        await login();
+    }
+</script>
+
 </body>
 </html>
