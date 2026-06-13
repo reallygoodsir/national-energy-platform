@@ -71,6 +71,8 @@
             cursor: pointer;
             background: #3b82f6;
             color: white;
+            display: block;
+            margin-top: 14px;
         }
 
         .box {
@@ -89,6 +91,37 @@
             margin-bottom: 10px;
             color: #cbd5e1;
             font-size: 14px;
+        }
+
+        #meterMessage {
+            margin-top: 14px;
+        }
+
+        .error {
+            color: #f87171;
+            margin-top: 10px;
+            white-space: pre-line;
+        }
+
+        .role {
+            display: inline-block;
+            padding: 6px 10px;
+            margin: 4px;
+            background: #1f2937;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .remove-role {
+            margin-left: 8px;
+            color: #f87171;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .muted {
+            color: #94a3b8;
+            font-size: 13px;
         }
     </style>
 </head>
@@ -117,7 +150,7 @@
 
             <button onclick="searchUser()">Search User</button>
 
-            <div id="errorBox"></div>
+            <div id="errorBox" class="error"></div>
 
             <div id="userBox" class="box hidden">
                 <h3 id="userName"></h3>
@@ -128,6 +161,8 @@
                 <div class="section-title">Assign New Role</div>
 
                 <select id="roleSelect"></select>
+
+                <div id="noRolesMsg" class="muted hidden">No available roles</div>
 
                 <button onclick="assignRole()">Assign Role</button>
 
@@ -144,7 +179,12 @@
                 <input id="meterSerial" type="text">
 
                 <div class="section-title">Phase Count</div>
-                <input id="meterPhase" type="number">
+                <select id="meterPhase">
+                    <option value="" selected disabled>-- Select Phase Count --</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                </select>
 
                 <div class="section-title">Type</div>
                 <select id="meterType"></select>
@@ -175,6 +215,100 @@
         loadMeterTypes();
     }
 
+    async function searchUser() {
+        const value = document.getElementById("searchInput").value;
+        const errorBox = document.getElementById("errorBox");
+
+        errorBox.innerText = "";
+
+        try {
+            const res = await fetch(`/national-energy-platform/api/users/search?value=${value}`);
+
+            if (!res.ok) {
+                errorBox.innerText = "User not found";
+                document.getElementById("userBox").classList.add("hidden");
+                return;
+            }
+
+            const data = await res.json();
+
+            currentUserId = data.userId;
+
+            document.getElementById("userBox").classList.remove("hidden");
+            document.getElementById("userName").innerText = data.fullName;
+
+            const assignedDiv = document.getElementById("assignedRoles");
+            assignedDiv.innerHTML = "";
+
+            data.assignedRoles.forEach(role => {
+                const span = document.createElement("span");
+                span.className = "role";
+                span.innerHTML = `
+                    ${role.name}
+                    <span class="remove-role" onclick="removeRole(${role.id})">x</span>
+                `;
+                assignedDiv.appendChild(span);
+            });
+
+            const select = document.getElementById("roleSelect");
+            const noRolesMsg = document.getElementById("noRolesMsg");
+
+            select.innerHTML = "";
+
+            if (!data.availableRoles || data.availableRoles.length === 0) {
+                select.classList.add("hidden");
+                noRolesMsg.classList.remove("hidden");
+            } else {
+                noRolesMsg.classList.add("hidden");
+                select.classList.remove("hidden");
+
+                data.availableRoles.forEach(role => {
+                    const opt = document.createElement("option");
+                    opt.value = role.id;
+                    opt.text = role.name;
+                    select.appendChild(opt);
+                });
+            }
+
+        } catch (e) {
+            errorBox.innerText = "Request failed";
+        }
+    }
+
+    async function assignRole() {
+        const roleId = document.getElementById("roleSelect").value;
+
+        const res = await fetch("/national-energy-platform/api/users/role", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                userId: currentUserId,
+                roleId: Number(roleId)
+            })
+        });
+
+        document.getElementById("assignMessage").innerText =
+            res.ok ? "Role assigned successfully" : "Failed to assign role";
+
+        searchUser();
+    }
+
+    async function removeRole(roleId) {
+        const res = await fetch("/national-energy-platform/api/users/role", {
+            method: "DELETE",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                userId: currentUserId,
+                roleId: roleId
+            })
+        });
+
+        document.getElementById("assignMessage").innerText =
+            res.ok ? "Role removed successfully" : "Failed to remove role";
+
+        searchUser();
+    }
+
     async function loadMeterTypes() {
         const res = await fetch("/national-energy-platform/api/electric-meters/types");
 
@@ -189,9 +323,16 @@
         const select = document.getElementById("meterType");
         select.innerHTML = "";
 
+        const placeholder = document.createElement("option");
+        placeholder.value = "";
+        placeholder.text = "-- Select Type --";
+        placeholder.selected = true;
+        placeholder.disabled = true;
+        select.appendChild(placeholder);
+
         data.forEach(t => {
             const opt = document.createElement("option");
-            opt.value = t.id;        // ✅ IMPORTANT: ID SENT
+            opt.value = t.id;
             opt.text = t.name;
             select.appendChild(opt);
         });
@@ -199,9 +340,25 @@
 
     async function createMeter() {
 
-        const serialNumber = document.getElementById("meterSerial").value;
+        const serialNumber = document.getElementById("meterSerial").value.trim();
         const phaseCount = document.getElementById("meterPhase").value;
         const typeId = document.getElementById("meterType").value;
+
+        const msg = document.getElementById("meterMessage");
+
+        msg.innerText = "";
+
+        // frontend validation (specific messages)
+        const errors = [];
+
+        if (!serialNumber) errors.push("Serial number is required");
+        if (!phaseCount) errors.push("Phase count is required");
+        if (!typeId) errors.push("Type is required");
+
+        if (errors.length > 0) {
+            msg.innerText = errors.join("\n");
+            return;
+        }
 
         const res = await fetch("/national-energy-platform/api/electric-meters", {
             method: "POST",
@@ -209,17 +366,30 @@
             body: JSON.stringify({
                 serialNumber,
                 phaseCount: Number(phaseCount),
-                typeId: Number(typeId)   // ✅ FIXED: ID not name
+                typeId: Number(typeId)
             })
         });
 
-        const msg = document.getElementById("meterMessage");
-
         if (res.ok) {
+            document.getElementById("meterSerial").value = "";
+            document.getElementById("meterPhase").selectedIndex = 0;
+            document.getElementById("meterType").selectedIndex = 0;
             msg.innerText = "Meter created successfully";
         } else {
-            const err = await res.text();
-            msg.innerText = err || "Failed to create meter";
+
+            let errText = await res.text();
+
+            try {
+                const parsed = JSON.parse(errText);
+
+                if (parsed.errors) {
+                    msg.innerText = Object.values(parsed.errors).join("\n");
+                } else {
+                    msg.innerText = parsed.message || errText;
+                }
+            } catch {
+                msg.innerText = errText;
+            }
         }
     }
 

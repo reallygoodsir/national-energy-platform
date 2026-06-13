@@ -2,7 +2,6 @@ package com.really.good.sir.energy.exception;
 
 import com.really.good.sir.energy.dto.response.ErrorResponse;
 import com.really.good.sir.energy.dto.response.ValidationErrorResponse;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -61,21 +60,6 @@ public class GlobalExceptionHandler {
                 ));
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGeneric(
-            Exception ex) {
-
-        ex.printStackTrace();
-
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ErrorResponse(
-                        LocalDateTime.now(),
-                        HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                        "Something went wrong"
-                ));
-    }
-
     @ExceptionHandler(PhoneNumberAlreadyExistsException.class)
     public ResponseEntity<ErrorResponse> handlePhone(
             PhoneNumberAlreadyExistsException ex) {
@@ -93,7 +77,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleUserNotFound(
             UserNotFoundException ex) {
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
                 .body(new ErrorResponse(
                         LocalDateTime.now(),
                         HttpStatus.NOT_FOUND.value(),
@@ -105,10 +90,50 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleRoleAlreadyAssigned(
             RoleAlreadyAssignedException ex) {
 
-        return ResponseEntity.status(HttpStatus.CONFLICT)
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
                 .body(new ErrorResponse(
                         LocalDateTime.now(),
                         HttpStatus.CONFLICT.value(),
+                        ex.getMessage()
+                ));
+    }
+
+    @ExceptionHandler(MeterTypeNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleMeterTypeNotFound(
+            MeterTypeNotFoundException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponse(
+                        LocalDateTime.now(),
+                        HttpStatus.NOT_FOUND.value(),
+                        ex.getMessage()
+                ));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGeneric(
+            Exception ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorResponse(
+                        LocalDateTime.now(),
+                        HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                        "Something went wrong"
+                ));
+    }
+
+    @ExceptionHandler(SerialNumberAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleSerialNumberExists(
+            SerialNumberAlreadyExistsException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(
+                        LocalDateTime.now(),
+                        HttpStatus.BAD_REQUEST.value(),
                         ex.getMessage()
                 ));
     }

@@ -5,6 +5,9 @@ import com.really.good.sir.energy.dto.response.ElectricMeterResponse;
 import com.really.good.sir.energy.dto.response.ElectricMeterTypeResponse;
 import com.really.good.sir.energy.entity.ElectricMeterEntity;
 import com.really.good.sir.energy.entity.ElectricMeterTypeEntity;
+import com.really.good.sir.energy.exception.MeterTypeNotFoundException;
+import com.really.good.sir.energy.exception.SerialNumberAlreadyExistsException;
+import com.really.good.sir.energy.mapper.ElectricMeterMapper;
 import com.really.good.sir.energy.repository.ElectricMeterRepository;
 import com.really.good.sir.energy.repository.ElectricMeterTypeRepository;
 import org.springframework.stereotype.Service;
@@ -16,23 +19,30 @@ public class ElectricMeterService {
 
     private final ElectricMeterRepository meterRepository;
     private final ElectricMeterTypeRepository typeRepository;
+    private final ElectricMeterMapper electricMeterMapper;
 
     public ElectricMeterService(
             ElectricMeterRepository meterRepository,
-            ElectricMeterTypeRepository typeRepository
+            ElectricMeterTypeRepository typeRepository,
+            ElectricMeterMapper electricMeterMapper
     ) {
         this.meterRepository = meterRepository;
         this.typeRepository = typeRepository;
+        this.electricMeterMapper = electricMeterMapper;
     }
 
     public ElectricMeterResponse create(ElectricMeterRequest request) {
 
         if (meterRepository.existsBySerialNumber(request.getSerialNumber())) {
-            throw new RuntimeException("Serial number already exists");
+            throw new SerialNumberAlreadyExistsException(
+                    request.getSerialNumber()
+            );
         }
 
         ElectricMeterTypeEntity type = typeRepository.findById(request.getTypeId())
-                .orElseThrow(() -> new RuntimeException("Meter type not found"));
+                .orElseThrow(() ->
+                        new MeterTypeNotFoundException(request.getTypeId())
+                );
 
         ElectricMeterEntity meter = new ElectricMeterEntity();
         meter.setSerialNumber(request.getSerialNumber());
@@ -41,18 +51,14 @@ public class ElectricMeterService {
 
         ElectricMeterEntity saved = meterRepository.save(meter);
 
-        return new ElectricMeterResponse(
-                saved.getId(),
-                saved.getSerialNumber(),
-                saved.getPhaseCount(),
-                saved.getType().getName()
-        );
+        return electricMeterMapper.toResponse(saved);
     }
 
     public List<ElectricMeterTypeResponse> getAllTypes() {
+
         return typeRepository.findAll()
                 .stream()
-                .map(t -> new ElectricMeterTypeResponse(t.getId(), t.getName()))
+                .map(electricMeterMapper::toTypeResponse)
                 .toList();
     }
 }
