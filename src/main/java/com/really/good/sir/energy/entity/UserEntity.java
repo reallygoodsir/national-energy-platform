@@ -35,6 +35,9 @@ public class UserEntity {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @OneToMany(mappedBy = "user")
+    private Set<ApartmentEntity> apartments = new HashSet<>();
+
     @ManyToMany
     @JoinTable(
             name = "user_roles",
@@ -46,21 +49,15 @@ public class UserEntity {
     public UserEntity() {
     }
 
-    public UserEntity(
-            Long id,
-            String fullName,
-            String email,
-            String phoneNumber,
-            String password,
-            LocalDateTime createdAt,
-            Set<RoleEntity> roles) {
-
+    public UserEntity(Long id, String fullName, String email, String phoneNumber, String password,
+                      LocalDateTime createdAt, Set<ApartmentEntity> apartments, Set<RoleEntity> roles) {
         this.id = id;
         this.fullName = fullName;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.password = password;
         this.createdAt = createdAt;
+        this.apartments = apartments;
         this.roles = roles;
     }
 
@@ -118,5 +115,13 @@ public class UserEntity {
 
     public void setRoles(Set<RoleEntity> roles) {
         this.roles = roles;
+    }
+
+    public Set<ApartmentEntity> getApartments() {
+        return apartments;
+    }
+
+    public void setApartments(Set<ApartmentEntity> apartments) {
+        this.apartments = apartments;
     }
 }
