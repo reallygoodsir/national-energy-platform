@@ -2,6 +2,7 @@ package com.really.good.sir.energy.mapper;
 
 import com.really.good.sir.energy.dto.response.ElectricMeterResponse;
 import com.really.good.sir.energy.dto.response.ElectricMeterTypeResponse;
+import com.really.good.sir.energy.entity.ApartmentEntity;
 import com.really.good.sir.energy.entity.ElectricMeterEntity;
 import com.really.good.sir.energy.entity.ElectricMeterTypeEntity;
 import org.springframework.stereotype.Service;
@@ -23,5 +24,15 @@ public class ElectricMeterMapper {
                 type.getId(),
                 type.getName()
         );
+    }
+
+    public void assignApartment(
+            ElectricMeterEntity meter,
+            ApartmentEntity apartment) {
+        meter.setApartment(apartment);
+    }
+
+    public void removeApartment(ElectricMeterEntity meter) {
+        meter.setApartment(null);
     }
 }

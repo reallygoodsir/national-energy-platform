@@ -135,4 +135,30 @@ public class GlobalExceptionHandler {
                         ex.getMessage()
                 ));
     }
+
+    @ExceptionHandler(ElectricMeterNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleElectricMeterNotFound(
+            ElectricMeterNotFoundException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponse(
+                        LocalDateTime.now(),
+                        HttpStatus.NOT_FOUND.value(),
+                        ex.getMessage()
+                ));
+    }
+
+    @ExceptionHandler(ApartmentNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleApartmentNotFound(
+            ApartmentNotFoundException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponse(
+                        LocalDateTime.now(),
+                        HttpStatus.NOT_FOUND.value(),
+                        ex.getMessage()
+                ));
+    }
 }

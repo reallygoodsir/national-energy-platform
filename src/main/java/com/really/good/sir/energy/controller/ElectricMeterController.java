@@ -1,5 +1,6 @@
 package com.really.good.sir.energy.controller;
 
+import com.really.good.sir.energy.dto.request.MeterRequest;
 import com.really.good.sir.energy.dto.request.ElectricMeterRequest;
 import com.really.good.sir.energy.dto.response.ElectricMeterResponse;
 import com.really.good.sir.energy.dto.response.ElectricMeterTypeResponse;
@@ -27,5 +28,28 @@ public class ElectricMeterController {
     @GetMapping("/types")
     public List<ElectricMeterTypeResponse> getTypes() {
         return electricMeterService.getAllTypes();
+    }
+
+    @PostMapping("/apartments/{apartmentId}")
+    public void assignMeter(
+            @PathVariable Long apartmentId,
+            @RequestBody MeterRequest request
+    ) {
+        electricMeterService.assignMeter(apartmentId, request);
+    }
+
+    @DeleteMapping("/apartments/{apartmentId}")
+    public void removeMeter(@PathVariable Long apartmentId) {
+        electricMeterService.removeMeter(apartmentId);
+    }
+
+    @GetMapping("/available")
+    public List<ElectricMeterResponse> getAvailableMeters() {
+        return electricMeterService.getAvailableMeters();
+    }
+
+    @GetMapping("/apartment/{apartmentId}")
+    public ElectricMeterResponse getAssignedMeter(@PathVariable Long apartmentId) {
+        return electricMeterService.getAssignedMeter(apartmentId);
     }
 }

@@ -135,6 +135,7 @@
         <div class="menu-item" onclick="showRoles()">User Roles</div>
         <div class="menu-item" onclick="showMeters()">Electric Meters</div>
         <div class="menu-item" onclick="showLocations()">User Location</div>
+
     </div>
 
     <div class="content">
@@ -222,14 +223,45 @@
 
                 <div id="locationMessage"></div>
             </div>
-        </div>
 
+            <hr>
+
+            <h3>Electric Meter</h3>
+
+            <div id="apartmentList"></div>
+
+            <div id="meterSection" class="hidden">
+
+                <div class="section-title">Current Meter</div>
+                <div id="currentMeter"></div>
+
+                <div id="assignMeterSection">
+
+                    <div class="section-title">Assign Meter</div>
+
+                    <select id="availableMeters"></select>
+
+                    <button id="assignMeterBtn" onclick="assignMeter()">
+                        Assign Meter
+                    </button>
+
+                </div>
+
+                <button onclick="removeMeter()">
+                    Remove Meter
+                </button>
+
+                <div id="meterAssignMessage"></div>
+
+            </div>
+        </div>
     </div>
 </div>
 
 <script>
 
     let currentUserId = null;
+    let selectedApartmentId = null;
 
     function showRoles() {
         document.getElementById("homeState").classList.add("hidden");
@@ -274,6 +306,7 @@
         const data = await res.json();
 
         currentUserId = data.userId;
+        await loadApartments();
 
         document.getElementById("userBox").classList.remove("hidden");
         document.getElementById("userName").innerText = data.fullName;
@@ -287,6 +320,31 @@
             span.innerHTML = `${role.name} <span class="remove-role" onclick="removeRole(${role.id})">x</span>`;
             assignedDiv.appendChild(span);
         });
+
+        const select = document.getElementById("roleSelect");
+        const noRolesMsg = document.getElementById("noRolesMsg");
+
+        select.innerHTML = "";
+
+        if (!data.availableRoles || data.availableRoles.length === 0) {
+            select.classList.add("hidden");
+            noRolesMsg.classList.remove("hidden");
+        } else {
+            noRolesMsg.classList.add("hidden");
+            select.classList.remove("hidden");
+
+            data.availableRoles.forEach(role => {
+                const option = document.createElement("option");
+                option.value = role.id;
+                option.text = role.name;
+                select.appendChild(option);
+            });
+        }
+
+        document.getElementById("locCity").value = "";
+        document.getElementById("locStreet").value = "";
+        document.getElementById("locBuilding").value = "";
+        document.getElementById("locApartment").value = "";
     }
 
     /* =========================
@@ -309,6 +367,7 @@
         const data = await res.json();
 
         currentUserId = data.userId;
+        await loadApartments();
 
         msg.innerText = `Selected: ${data.fullName} (ID: ${data.userId})`;
     }
@@ -332,6 +391,7 @@
             return;
         }
 
+
         const res = await fetch(`/national-energy-platform/api/locations/${currentUserId}`, {
             method: "POST",
             headers: {"Content-Type": "application/json"},
@@ -343,9 +403,319 @@
             })
         });
 
-        msg.innerText = res.ok ? "Location saved successfully" : await res.text();
+        if (res.ok) {
+            msg.innerText = "Location saved successfully";
+
+            document.getElementById("locCity").value = "";
+            document.getElementById("locStreet").value = "";
+            document.getElementById("locBuilding").value = "";
+            document.getElementById("locApartment").value = "";
+
+            await loadApartments();
+        } else {
+            msg.innerText = await res.text();
+        }
     }
 
+    async function logout() {
+        await fetch("/national-energy-platform/api/auth/logout", {
+            method: "POST",
+            credentials: "include"
+        });
+
+        window.location.href =
+            "/national-energy-platform/index.html";
+    }
+
+    async function loadApartments() {
+        const res = await fetch(`/national-energy-platform/api/users/${currentUserId}/apartments`);
+
+        const apartments = await res.json();
+
+        const container = document.getElementById("apartmentList");
+        container.innerHTML = "";
+
+        if (apartments.length === 0) {
+            container.innerText = "No locations assigned.";
+            return;
+        }
+
+        selectedApartmentId = null;
+        document.getElementById("meterSection").classList.add("hidden");
+
+        apartments.forEach(apartment => {
+
+            const button = document.createElement("button");
+
+            button.innerText =
+                `${apartment.street} ${apartment.buildingNumber}/${apartment.apartmentNumber}`;
+
+            button.onclick = () => selectApartment(apartment.id);
+
+            container.appendChild(button);
+        });
+    }
+
+    async function loadCurrentMeter() {
+
+        const res = await fetch(
+            `/national-energy-platform/api/electric-meters/apartment/${selectedApartmentId}`
+        );
+
+        const div = document.getElementById("currentMeter");
+
+        if (!res.ok) {
+            div.innerText = "No meter assigned";
+            return;
+        }
+
+        const meter = await res.json();
+
+        div.innerText =
+            `${meter.serialNumber} (${meter.typeName}, ${meter.phaseCount} Phase)`;
+    }
+
+    async function loadAvailableMeters(apartmentId) {
+
+        const select = document.getElementById("availableMeters");
+        const assignBtn = document.getElementById("assignMeterBtn");
+        const msg = document.getElementById("meterAssignMessage");
+
+        const assignSection = document.getElementById("assignMeterSection");
+
+        assignSection.classList.remove("hidden");
+        msg.innerText = "";
+        select.innerHTML = "";
+
+        selectedApartmentId = apartmentId;
+
+        const currentRes = await fetch(
+            `/national-energy-platform/api/electric-meters/apartment/${apartmentId}`
+        );
+
+        if (currentRes.ok) {
+            const current = await currentRes.json();
+
+            msg.innerText = `Current meter: ${current.serialNumber}`;
+            assignBtn.disabled = true;
+
+            assignSection.classList.add("hidden");
+
+            return;
+        }
+
+        const availableRes = await fetch(
+            "/national-energy-platform/api/electric-meters/available"
+        );
+
+        if (!availableRes.ok) {
+            msg.innerText = "Failed to load available meters";
+            assignBtn.disabled = true;
+            return;
+        }
+
+        const meters = await availableRes.json();
+
+        if (meters.length === 0) {
+            msg.innerText = "No unassigned meters available";
+            assignBtn.disabled = true;
+            return;
+        }
+
+        meters.forEach(meter => {
+            const option = document.createElement("option");
+            option.value = meter.id;
+            option.text = `${meter.serialNumber} (${meter.typeName})`;
+            select.appendChild(option);
+        });
+
+        assignBtn.disabled = false;
+    }
+
+    async function assignMeter() {
+
+        const meterId =
+            Number(document.getElementById("availableMeters").value);
+
+        const res = await fetch(
+            `/national-energy-platform/api/electric-meters/apartments/${selectedApartmentId}`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    meterId: meterId
+                })
+            }
+        );
+
+        document.getElementById("meterAssignMessage").innerText =
+            res.ok
+                ? "Meter assigned successfully"
+                : await res.text();
+
+        if (res.ok) {
+            await loadCurrentMeter();
+            await loadAvailableMeters(selectedApartmentId);
+        }
+    }
+
+    async function removeMeter() {
+
+        const res = await fetch(
+            `/national-energy-platform/api/electric-meters/apartments/${selectedApartmentId}`,
+            {
+                method: "DELETE"
+            }
+        );
+
+        const msg = document.getElementById("meterAssignMessage");
+
+        if (res.ok) {
+            msg.innerText = "Meter removed successfully";
+            await loadCurrentMeter();
+            await loadAvailableMeters(selectedApartmentId);
+            return;
+        }
+
+        const errorText = await res.text();
+
+        try {
+            const parsed = JSON.parse(errorText);
+            msg.innerText = parsed.message || errorText;
+        } catch {
+            msg.innerText = errorText;
+        }
+    }
+
+    async function selectApartment(apartmentId) {
+
+        selectedApartmentId = apartmentId;
+
+        document.getElementById("meterSection")
+            .classList.remove("hidden");
+
+        await loadCurrentMeter();
+        await loadAvailableMeters(apartmentId);
+    }
+
+    async function assignRole() {
+      const roleId = document.getElementById("roleSelect").value;
+
+      const res = await fetch("/national-energy-platform/api/users/role", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({
+              userId: currentUserId,
+              roleId: Number(roleId)
+          })
+      });
+
+      document.getElementById("assignMessage").innerText =
+          res.ok ? "Role assigned successfully" : "Failed to assign role";
+
+      searchUser();
+  }
+
+  async function removeRole(roleId) {
+      const res = await fetch("/national-energy-platform/api/users/role", {
+          method: "DELETE",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({
+              userId: currentUserId,
+              roleId: roleId
+          })
+      });
+
+      document.getElementById("assignMessage").innerText =
+          res.ok ? "Role removed successfully" : "Failed to remove role";
+
+      searchUser();
+  }
+
+  async function loadMeterTypes() {
+      const res = await fetch("/national-energy-platform/api/electric-meters/types");
+
+      if (!res.ok) {
+          document.getElementById("meterMessage").innerText =
+              "Failed to load meter types";
+          return;
+      }
+
+      const data = await res.json();
+
+      const select = document.getElementById("meterType");
+      select.innerHTML = "";
+
+      const placeholder = document.createElement("option");
+      placeholder.value = "";
+      placeholder.text = "-- Select Type --";
+      placeholder.selected = true;
+      placeholder.disabled = true;
+      select.appendChild(placeholder);
+
+      data.forEach(t => {
+          const opt = document.createElement("option");
+          opt.value = t.id;
+          opt.text = t.name;
+          select.appendChild(opt);
+      });
+  }
+
+  async function createMeter() {
+
+      const serialNumber = document.getElementById("meterSerial").value.trim();
+      const phaseCount = document.getElementById("meterPhase").value;
+      const typeId = document.getElementById("meterType").value;
+
+      const msg = document.getElementById("meterMessage");
+
+      msg.innerText = "";
+
+      const errors = [];
+
+      if (!serialNumber) errors.push("Serial number is required");
+      if (!phaseCount) errors.push("Phase count is required");
+      if (!typeId) errors.push("Type is required");
+
+      if (errors.length > 0) {
+          msg.innerText = errors.join("\n");
+          return;
+      }
+
+      const res = await fetch("/national-energy-platform/api/electric-meters", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({
+              serialNumber,
+              phaseCount: Number(phaseCount),
+              typeId: Number(typeId)
+          })
+      });
+
+      if (res.ok) {
+          document.getElementById("meterSerial").value = "";
+          document.getElementById("meterPhase").selectedIndex = 0;
+          document.getElementById("meterType").selectedIndex = 0;
+          msg.innerText = "Meter created successfully";
+      } else {
+
+          let errText = await res.text();
+
+          try {
+              const parsed = JSON.parse(errText);
+
+              if (parsed.errors) {
+                  msg.innerText = Object.values(parsed.errors).join("\n");
+              } else {
+                  msg.innerText = parsed.message || errText;
+              }
+          } catch {
+              msg.innerText = errText;
+          }
+      }
+  }
 </script>
 
 </body>

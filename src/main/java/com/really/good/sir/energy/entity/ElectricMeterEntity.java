@@ -20,6 +20,10 @@ public class ElectricMeterEntity {
     @JoinColumn(name = "type_id", nullable = false)
     private ElectricMeterTypeEntity type;
 
+    @OneToOne
+    @JoinColumn(name = "apartment_id", unique = true)
+    private ApartmentEntity apartment;
+
     public ElectricMeterEntity() {}
 
     public Long getId() {
@@ -48,5 +52,13 @@ public class ElectricMeterEntity {
 
     public void setType(ElectricMeterTypeEntity type) {
         this.type = type;
+    }
+
+    public ApartmentEntity getApartment() {
+        return apartment;
+    }
+
+    public void setApartment(ApartmentEntity apartment) {
+        this.apartment = apartment;
     }
 }

@@ -1,8 +1,9 @@
 package com.really.good.sir.energy.controller;
 
 import com.really.good.sir.energy.dto.request.RoleRequest;
-import com.really.good.sir.energy.dto.response.UserResponse;
+import com.really.good.sir.energy.dto.response.ApartmentResponse;
 import com.really.good.sir.energy.dto.response.SearchUserResponse;
+import com.really.good.sir.energy.dto.response.UserResponse;
 import com.really.good.sir.energy.entity.RoleEntity;
 import com.really.good.sir.energy.entity.UserEntity;
 import com.really.good.sir.energy.service.UserService;
@@ -50,5 +51,10 @@ public class UserController {
                 user.getEmail(),
                 roles
         );
+    }
+
+    @GetMapping("/{userId}/apartments")
+    public List<ApartmentResponse> getUserApartments(@PathVariable Long userId) {
+        return userService.getUserApartments(userId);
     }
 }
