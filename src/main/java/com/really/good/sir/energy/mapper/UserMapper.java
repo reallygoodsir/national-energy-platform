@@ -3,6 +3,8 @@ package com.really.good.sir.energy.mapper;
 import com.really.good.sir.energy.dto.request.SignupRequest;
 import com.really.good.sir.energy.dto.response.RoleResponse;
 import com.really.good.sir.energy.dto.response.SearchUserResponse;
+import com.really.good.sir.energy.dto.response.UserResponse;
+import com.really.good.sir.energy.entity.RoleEntity;
 import com.really.good.sir.energy.entity.UserEntity;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +36,19 @@ public class UserMapper {
                 user.getFullName(),
                 assignedRoles,
                 availableRoles
+        );
+    }
+
+    public UserResponse toUserResponse(UserEntity user) {
+        List<String> roles = user.getRoles()
+                .stream()
+                .map(RoleEntity::getName)
+                .toList();
+
+        return new UserResponse(
+                user.getId(),
+                user.getEmail(),
+                roles
         );
     }
 }

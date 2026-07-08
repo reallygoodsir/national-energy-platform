@@ -1,722 +1,767 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>User Maintenance</title>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>User Maintenance</title>
 
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            height: 100vh;
-            background: #0f172a;
-            color: white;
-        }
+        <style>
+            body {
+                margin: 0;
+                font-family: Arial, sans-serif;
+                height: 100vh;
+                background: #0f172a;
+                color: white;
+            }
 
-        .app {
-            display: flex;
-            height: 100vh;
-        }
+            .app {
+                display: flex;
+                height: 100vh;
+            }
 
-        .side-menu {
-            width: 180px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            background: #0b1220;
-            border-right: 1px solid #1f2937;
-        }
+            .side-menu {
+                width: 180px;
+                padding: 20px;
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                background: #0b1220;
+                border-right: 1px solid #1f2937;
+            }
 
-        .menu-item {
-            cursor: pointer;
-            color: #cbd5e1;
-            font-size: 14px;
-            padding: 8px 10px;
-            border-radius: 4px;
-        }
+            .menu-item {
+                cursor: pointer;
+                color: #cbd5e1;
+                font-size: 14px;
+                padding: 8px 10px;
+                border-radius: 4px;
+            }
 
-        .menu-item:hover {
-            background: #1f2937;
-            color: white;
-        }
+            .menu-item:hover {
+                background: #1f2937;
+                color: white;
+            }
 
-        .menu-item.logout {
-            color: #f87171;
-        }
+            .menu-item.logout {
+                color: #f87171;
+            }
 
-        .menu-item.logout:hover {
-            background: #3b1f1f;
-        }
+            .menu-item.logout:hover {
+                background: #3b1f1f;
+            }
 
-        .content {
-            flex: 1;
-            padding: 40px;
-            overflow-y: auto;
-        }
+            .content {
+                flex: 1;
+                padding: 40px;
+                overflow-y: auto;
+            }
 
-        input, select {
-            margin: 8px 0;
-            padding: 10px;
-            border: none;
-            border-radius: 4px;
-            width: 100%;
-            max-width: 340px;
-        }
+            input, select {
+                margin: 8px 0;
+                padding: 10px;
+                border: none;
+                border-radius: 4px;
+                width: 100%;
+                max-width: 340px;
+            }
 
-        button {
-            padding: 10px 14px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            background: #3b82f6;
-            color: white;
-            display: block;
-            margin-top: 14px;
-        }
+            button {
+                padding: 10px 14px;
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+                background: #3b82f6;
+                color: white;
+                display: block;
+                margin-top: 14px;
+            }
 
-        .box {
-            margin-top: 20px;
-            padding: 15px;
-            border: 1px solid #1f2937;
-            border-radius: 6px;
-            background: #0b1220;
-            max-width: 500px;
-        }
+            .box {
+                margin-top: 20px;
+                padding: 15px;
+                border: 1px solid #1f2937;
+                border-radius: 6px;
+                background: #0b1220;
+                max-width: 500px;
+            }
 
-        .hidden { display: none; }
+            .hidden { display: none; }
 
-        .section-title {
-            margin-top: 20px;
-            margin-bottom: 10px;
-            color: #cbd5e1;
-            font-size: 14px;
-        }
+            .section-title {
+                margin-top: 20px;
+                margin-bottom: 10px;
+                color: #cbd5e1;
+                font-size: 14px;
+            }
 
-        #meterMessage {
-            margin-top: 14px;
-        }
+            #meterMessage {
+                margin-top: 14px;
+            }
 
-        .error {
-            color: #f87171;
-            margin-top: 10px;
-            white-space: pre-line;
-        }
+            .error {
+                color: #f87171;
+                margin-top: 10px;
+                white-space: pre-line;
+            }
 
-        .role {
-            display: inline-block;
-            padding: 6px 10px;
-            margin: 4px;
-            background: #1f2937;
-            border-radius: 6px;
-            font-size: 13px;
-        }
+            .role {
+                display: inline-block;
+                padding: 6px 10px;
+                margin: 4px;
+                background: #1f2937;
+                border-radius: 6px;
+                font-size: 13px;
+            }
 
-        .remove-role {
-            margin-left: 8px;
-            color: #f87171;
-            cursor: pointer;
-            font-weight: bold;
-        }
+            .remove-role {
+                margin-left: 8px;
+                color: #f87171;
+                cursor: pointer;
+                font-weight: bold;
+            }
 
-        .muted {
-            color: #94a3b8;
-            font-size: 13px;
-        }
-    </style>
-</head>
+            .muted {
+                color: #94a3b8;
+                font-size: 13px;
+            }
+        </style>
+    </head>
 
-<body>
+    <body>
 
-<div class="app">
+    <div class="app">
 
-    <div class="side-menu">
-        <div class="menu-item logout" onclick="logout()">Logout</div>
-        <div class="menu-item" onclick="showRoles()">User Roles</div>
-        <div class="menu-item" onclick="showMeters()">Electric Meters</div>
-        <div class="menu-item" onclick="showLocations()">User Location</div>
-
-    </div>
-
-    <div class="content">
-
-        <div id="homeState">
-            <h2>Welcome</h2>
-            <p>Select a menu option.</p>
+        <div class="side-menu">
+            <div class="menu-item logout" onclick="logout()">Logout</div>
+            <div class="menu-item" onclick="showRoles()">User Roles</div>
+            <div class="menu-item" onclick="showMeters()">Electric Meters</div>
+            <div class="menu-item" onclick="showLocations()">User Location</div>
+            <div class="menu-item" onclick="showApartmentMeters()">Apartment Meters</div>
         </div>
 
-        <!-- ROLES -->
-        <div id="rolesPanel" class="hidden">
-            <h2>User Search</h2>
+        <div class="content">
 
-            <input type="text" id="searchInput" placeholder="Enter email or phone">
-            <button onclick="searchUser()">Search User</button>
-
-            <div id="errorBox" class="error"></div>
-
-            <div id="userBox" class="box hidden">
-                <h3 id="userName"></h3>
-
-                <div class="section-title">Assigned Roles</div>
-                <div id="assignedRoles"></div>
-
-                <div class="section-title">Assign New Role</div>
-                <select id="roleSelect"></select>
-
-                <div id="noRolesMsg" class="muted hidden">No available roles</div>
-
-                <button onclick="assignRole()">Assign Role</button>
-                <div id="assignMessage"></div>
-            </div>
-        </div>
-
-        <!-- METERS -->
-        <div id="metersPanel" class="hidden">
-            <h2>Create Electric Meter</h2>
-
-            <div class="box">
-
-                <div class="section-title">Serial Number</div>
-                <input id="meterSerial" type="text">
-
-                <div class="section-title">Phase Count</div>
-                <select id="meterPhase">
-                    <option value="" selected disabled>-- Select Phase Count --</option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                </select>
-
-                <div class="section-title">Type</div>
-                <select id="meterType"></select>
-
-                <button onclick="createMeter()">Create Meter</button>
-                <div id="meterMessage"></div>
-            </div>
-        </div>
-
-        <!-- LOCATION -->
-        <div id="locationsPanel" class="hidden">
-            <h2>User Location</h2>
-
-            <div class="box">
-
-                <div class="section-title">Select User</div>
-                <input id="locUserSearch" type="text" placeholder="email or phone">
-                <button onclick="selectUserForLocation()">Find User</button>
-
-                <div id="selectedUserInfo" class="muted"></div>
-
-                <div class="section-title">City</div>
-                <input id="locCity" type="text">
-
-                <div class="section-title">Street</div>
-                <input id="locStreet" type="text">
-
-                <div class="section-title">Building</div>
-                <input id="locBuilding" type="text">
-
-                <div class="section-title">Apartment (optional)</div>
-                <input id="locApartment" type="text">
-
-                <button onclick="createLocation()">Save Location</button>
-
-                <div id="locationMessage"></div>
+            <div id="homeState">
+                <h2>Welcome</h2>
+                <p>Select a menu option.</p>
             </div>
 
-            <hr>
+            <div id="rolesPanel" class="hidden">
+                <h2>User Search</h2>
 
-            <h3>Electric Meter</h3>
+                <input type="text" id="searchInput" placeholder="Enter email or phone">
+                <button onclick="searchUser()">Search User</button>
 
-            <div id="apartmentList"></div>
+                <div id="errorBox" class="error"></div>
 
-            <div id="meterSection" class="hidden">
+                <div id="userBox" class="box hidden">
+                    <h3 id="userName"></h3>
 
-                <div class="section-title">Current Meter</div>
-                <div id="currentMeter"></div>
+                    <div class="section-title">Assigned Roles</div>
+                    <div id="assignedRoles"></div>
 
-                <div id="assignMeterSection">
+                    <div class="section-title">Assign New Role</div>
+                    <select id="roleSelect"></select>
 
-                    <div class="section-title">Assign Meter</div>
+                    <div id="noRolesMsg" class="muted hidden">No available roles</div>
 
-                    <select id="availableMeters"></select>
+                    <button onclick="assignRole()">Assign Role</button>
+                    <div id="assignMessage"></div>
+                </div>
+            </div>
 
-                    <button id="assignMeterBtn" onclick="assignMeter()">
-                        Assign Meter
+            <div id="metersPanel" class="hidden">
+                <h2>Create Electric Meter</h2>
+
+                <div class="box">
+
+                    <div class="section-title">Serial Number</div>
+                    <input id="meterSerial" type="text">
+
+                    <div class="section-title">Phase Count</div>
+                    <select id="meterPhase">
+                        <option value="" selected disabled>-- Select Phase Count --</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                    </select>
+
+                    <div class="section-title">Type</div>
+                    <select id="meterType"></select>
+
+                    <button onclick="createMeter()">Create Meter</button>
+                    <div id="meterMessage"></div>
+                </div>
+            </div>
+
+            <div id="locationsPanel" class="hidden">
+                <h2>User Location</h2>
+
+                <div class="box">
+
+                    <div class="section-title">Select User</div>
+                    <input id="locUserSearch" type="text" placeholder="email or phone">
+                    <button onclick="selectUserForLocation()">Find User</button>
+
+                    <div id="selectedUserInfo" class="muted"></div>
+
+                    <div class="section-title">City</div>
+                    <input id="locCity" type="text">
+
+                    <div class="section-title">Street</div>
+                    <input id="locStreet" type="text">
+
+                    <div class="section-title">Building</div>
+                    <input id="locBuilding" type="text">
+
+                    <div class="section-title">Apartment (optional)</div>
+                    <input id="locApartment" type="text">
+
+                    <button onclick="createLocation()">Save Location</button>
+                    <div id="locationMessage"></div>
+                </div>
+            </div>
+
+            <div id="apartmentMetersPanel" class="hidden">
+
+                <h2>Apartment Meters</h2>
+
+                <input
+                        id="meterUserSearch"
+                        type="text"
+                        placeholder="email or phone">
+
+                <button onclick="selectUserForMeters()">
+                    Find User
+                </button>
+
+                <div id="meterSelectedUserInfo" class="muted"></div>
+
+                <hr>
+
+                <div id="meterApartmentList"></div>
+
+                <div id="meterSection" class="hidden">
+
+                    <h3>Current Meter</h3>
+
+                    <div id="currentMeter" class="box">
+                        No apartment selected.
+                    </div>
+
+                    <button
+                            onclick="removeMeter()"
+                            style="background:#dc2626;">
+                        Remove Meter
                     </button>
+
+                    <hr>
+
+                    <div id="assignMeterSection">
+
+                        <h3>Assign Meter</h3>
+
+                        <select id="availableMeters"></select>
+
+                        <button
+                                id="assignMeterBtn"
+                                onclick="assignMeter()">
+                            Assign Meter
+                        </button>
+
+                    </div>
+
+                    <div id="meterAssignMessage"></div>
 
                 </div>
 
-                <button onclick="removeMeter()">
-                    Remove Meter
-                </button>
-
-                <div id="meterAssignMessage"></div>
-
             </div>
         </div>
     </div>
-</div>
 
-<script>
+    <script>
 
-    let currentUserId = null;
-    let selectedApartmentId = null;
+        let currentUserId = null;
+        let meterUserId = null;
+        let selectedApartmentId = null;
 
-    function showRoles() {
-        document.getElementById("homeState").classList.add("hidden");
-        document.getElementById("metersPanel").classList.add("hidden");
-        document.getElementById("locationsPanel").classList.add("hidden");
-        document.getElementById("rolesPanel").classList.remove("hidden");
-    }
+        function showApartmentMeters() {
+            meterUserId = null;
+            selectedApartmentId = null;
 
-    function showMeters() {
-        document.getElementById("homeState").classList.add("hidden");
-        document.getElementById("rolesPanel").classList.add("hidden");
-        document.getElementById("locationsPanel").classList.add("hidden");
-        document.getElementById("metersPanel").classList.remove("hidden");
-        loadMeterTypes();
-    }
+            document.getElementById("homeState").classList.add("hidden");
+            document.getElementById("rolesPanel").classList.add("hidden");
+            document.getElementById("metersPanel").classList.add("hidden");
+            document.getElementById("locationsPanel").classList.add("hidden");
 
-    function showLocations() {
-        document.getElementById("homeState").classList.add("hidden");
-        document.getElementById("rolesPanel").classList.add("hidden");
-        document.getElementById("metersPanel").classList.add("hidden");
-        document.getElementById("locationsPanel").classList.remove("hidden");
-    }
-
-    /* =========================
-       ROLE SEARCH (UNCHANGED)
-    ========================= */
-
-    async function searchUser() {
-        const value = document.getElementById("searchInput").value;
-        const errorBox = document.getElementById("errorBox");
-
-        errorBox.innerText = "";
-
-        const res = await fetch(`/national-energy-platform/api/users/search?value=${value}`);
-
-        if (!res.ok) {
-            errorBox.innerText = "User not found";
-            document.getElementById("userBox").classList.add("hidden");
-            return;
+            document.getElementById("apartmentMetersPanel")
+                .classList.remove("hidden");
         }
 
-        const data = await res.json();
+        function showRoles() {
+            document.getElementById("homeState").classList.add("hidden");
+            document.getElementById("metersPanel").classList.add("hidden");
+            document.getElementById("locationsPanel").classList.add("hidden");
+            document.getElementById("rolesPanel").classList.remove("hidden");
+            document.getElementById("apartmentMetersPanel").classList.add("hidden");
+        }
 
-        currentUserId = data.userId;
-        await loadApartments();
+        function showMeters() {
+            document.getElementById("homeState").classList.add("hidden");
+            document.getElementById("rolesPanel").classList.add("hidden");
+            document.getElementById("locationsPanel").classList.add("hidden");
+            document.getElementById("metersPanel").classList.remove("hidden");
+            document.getElementById("apartmentMetersPanel").classList.add("hidden");
+            loadMeterTypes();
+        }
 
-        document.getElementById("userBox").classList.remove("hidden");
-        document.getElementById("userName").innerText = data.fullName;
+        function showLocations() {
+            document.getElementById("homeState").classList.add("hidden");
+            document.getElementById("rolesPanel").classList.add("hidden");
+            document.getElementById("metersPanel").classList.add("hidden");
+            document.getElementById("apartmentMetersPanel").classList.add("hidden");
+            document.getElementById("locationsPanel").classList.remove("hidden");
+        }
 
-        const assignedDiv = document.getElementById("assignedRoles");
-        assignedDiv.innerHTML = "";
+        async function searchUser() {
+            const value = document.getElementById("searchInput").value;
+            const errorBox = document.getElementById("errorBox");
 
-        data.assignedRoles.forEach(role => {
-            const span = document.createElement("span");
-            span.className = "role";
-            span.innerHTML = `${role.name} <span class="remove-role" onclick="removeRole(${role.id})">x</span>`;
-            assignedDiv.appendChild(span);
-        });
+            errorBox.innerText = "";
 
-        const select = document.getElementById("roleSelect");
-        const noRolesMsg = document.getElementById("noRolesMsg");
+            const res = await fetch(`/national-energy-platform/api/users/search?value=${value}`);
 
-        select.innerHTML = "";
+            if (!res.ok) {
+                errorBox.innerText = "User not found";
+                document.getElementById("userBox").classList.add("hidden");
+                return;
+            }
 
-        if (!data.availableRoles || data.availableRoles.length === 0) {
-            select.classList.add("hidden");
-            noRolesMsg.classList.remove("hidden");
-        } else {
-            noRolesMsg.classList.add("hidden");
-            select.classList.remove("hidden");
+            const data = await res.json();
 
-            data.availableRoles.forEach(role => {
-                const option = document.createElement("option");
-                option.value = role.id;
-                option.text = role.name;
-                select.appendChild(option);
+            currentUserId = data.userId;
+
+            document.getElementById("userBox").classList.remove("hidden");
+            document.getElementById("userName").innerText = data.fullName;
+
+            const assignedDiv = document.getElementById("assignedRoles");
+            assignedDiv.innerHTML = "";
+
+            data.assignedRoles.forEach(role => {
+                const span = document.createElement("span");
+                span.className = "role";
+                span.innerHTML = `${role.name} <span class="remove-role" onclick="removeRole(${role.id})">x</span>`;
+                assignedDiv.appendChild(span);
+            });
+
+            const select = document.getElementById("roleSelect");
+            const noRolesMsg = document.getElementById("noRolesMsg");
+
+            select.innerHTML = "";
+
+            if (!data.availableRoles || data.availableRoles.length === 0) {
+                select.classList.add("hidden");
+                noRolesMsg.classList.remove("hidden");
+            } else {
+                noRolesMsg.classList.add("hidden");
+                select.classList.remove("hidden");
+
+                data.availableRoles.forEach(role => {
+                    const option = document.createElement("option");
+                    option.value = role.id;
+                    option.text = role.name;
+                    select.appendChild(option);
+                });
+            }
+        }
+
+        async function selectUserForLocation() {
+            const value = document.getElementById("locUserSearch").value;
+
+            const res = await fetch(`/national-energy-platform/api/users/search?value=${value}`);
+
+            const msg = document.getElementById("selectedUserInfo");
+
+            if (!res.ok) {
+                msg.innerText = "User not found";
+                currentUserId = null;
+                return;
+            }
+
+            const data = await res.json();
+
+            currentUserId = data.userId;
+
+            msg.innerText = `Selected: ${data.fullName} (ID: ${data.userId})`;
+        }
+
+        async function selectUserForMeters() {
+            document.getElementById("meterSection").classList.add("hidden");
+            document.getElementById("currentMeter").innerText = "No apartment selected.";
+            document.getElementById("meterAssignMessage").innerText = "";
+            const value = document.getElementById("meterUserSearch").value;
+
+            const res = await fetch(`/national-energy-platform/api/users/search?value=${value}`);
+
+            const msg = document.getElementById("meterSelectedUserInfo");
+
+            if (!res.ok) {
+                msg.innerText = "User not found";
+                meterUserId = null;
+                return;
+            }
+
+            const data = await res.json();
+
+            meterUserId = data.userId;
+            await loadMeterApartments();
+
+            msg.innerText = `Selected: ${data.fullName} (ID: ${data.userId})`;
+        }
+
+        async function loadMeterApartments() {
+
+            const res = await fetch(
+                `/national-energy-platform/api/users/${meterUserId}/apartments`
+            );
+
+            const apartments = await res.json();
+
+            const container = document.getElementById("meterApartmentList");
+            container.innerHTML = "";
+
+            if (apartments.length === 0) {
+                container.innerText = "No locations assigned.";
+                return;
+            }
+
+            selectedApartmentId = null;
+            document.getElementById("meterSection").classList.add("hidden");
+
+            apartments.forEach(apartment => {
+
+                const button = document.createElement("button");
+
+                button.innerText =
+                    `${apartment.street} ${apartment.buildingNumber}/${apartment.apartmentNumber}`;
+
+                button.onclick = () => selectApartment(apartment.id);
+
+                container.appendChild(button);
             });
         }
 
-        document.getElementById("locCity").value = "";
-        document.getElementById("locStreet").value = "";
-        document.getElementById("locBuilding").value = "";
-        document.getElementById("locApartment").value = "";
-    }
+        async function createLocation() {
 
-    /* =========================
-       LOCATION USER SEARCH (NEW)
-    ========================= */
+            const city = document.getElementById("locCity").value.trim();
+            const street = document.getElementById("locStreet").value.trim();
+            const building = document.getElementById("locBuilding").value.trim();
+            const apartment = document.getElementById("locApartment").value.trim();
 
-    async function selectUserForLocation() {
-        const value = document.getElementById("locUserSearch").value;
+            const msg = document.getElementById("locationMessage");
+            msg.innerText = "";
 
-        const res = await fetch(`/national-energy-platform/api/users/search?value=${value}`);
+            if (!currentUserId) {
+                msg.innerText = "Select a user first";
+                return;
+            }
 
-        const msg = document.getElementById("selectedUserInfo");
 
-        if (!res.ok) {
-            msg.innerText = "User not found";
-            currentUserId = null;
-            return;
+            const res = await fetch(`/national-energy-platform/api/locations/${currentUserId}`, {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    city,
+                    street,
+                    buildingNumber: building,
+                    apartmentNumber: apartment || null
+                })
+            });
+
+            if (res.ok) {
+                msg.innerText = "Location saved successfully";
+
+                document.getElementById("locCity").value = "";
+                document.getElementById("locStreet").value = "";
+                document.getElementById("locBuilding").value = "";
+                document.getElementById("locApartment").value = "";
+
+            } else {
+                msg.innerText = await res.text();
+            }
         }
 
-        const data = await res.json();
+        async function logout() {
+            await fetch("/national-energy-platform/api/auth/logout", {
+                method: "POST",
+                credentials: "include"
+            });
 
-        currentUserId = data.userId;
-        await loadApartments();
-
-        msg.innerText = `Selected: ${data.fullName} (ID: ${data.userId})`;
-    }
-
-    /* =========================
-       LOCATION SAVE
-    ========================= */
-
-    async function createLocation() {
-
-        const city = document.getElementById("locCity").value.trim();
-        const street = document.getElementById("locStreet").value.trim();
-        const building = document.getElementById("locBuilding").value.trim();
-        const apartment = document.getElementById("locApartment").value.trim();
-
-        const msg = document.getElementById("locationMessage");
-        msg.innerText = "";
-
-        if (!currentUserId) {
-            msg.innerText = "Select a user first";
-            return;
+            window.location.href =
+                "/national-energy-platform/index.html";
         }
 
+        async function loadCurrentMeter() {
 
-        const res = await fetch(`/national-energy-platform/api/locations/${currentUserId}`, {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({
-                city,
-                street,
-                buildingNumber: building,
-                apartmentNumber: apartment || null
-            })
-        });
+            const res = await fetch(
+                `/national-energy-platform/api/electric-meters/apartment/${selectedApartmentId}`
+            );
 
-        if (res.ok) {
-            msg.innerText = "Location saved successfully";
+            const div = document.getElementById("currentMeter");
 
-            document.getElementById("locCity").value = "";
-            document.getElementById("locStreet").value = "";
-            document.getElementById("locBuilding").value = "";
-            document.getElementById("locApartment").value = "";
+            if (!res.ok) {
+                div.innerText = "No meter assigned";
+                return;
+            }
 
-            await loadApartments();
-        } else {
-            msg.innerText = await res.text();
-        }
-    }
+            const meter = await res.json();
 
-    async function logout() {
-        await fetch("/national-energy-platform/api/auth/logout", {
-            method: "POST",
-            credentials: "include"
-        });
-
-        window.location.href =
-            "/national-energy-platform/index.html";
-    }
-
-    async function loadApartments() {
-        const res = await fetch(`/national-energy-platform/api/users/${currentUserId}/apartments`);
-
-        const apartments = await res.json();
-
-        const container = document.getElementById("apartmentList");
-        container.innerHTML = "";
-
-        if (apartments.length === 0) {
-            container.innerText = "No locations assigned.";
-            return;
+            div.innerText =
+                `${meter.serialNumber} (${meter.typeName}, ${meter.phaseCount} Phase)`;
         }
 
-        selectedApartmentId = null;
-        document.getElementById("meterSection").classList.add("hidden");
+        async function loadAvailableMeters(apartmentId) {
 
-        apartments.forEach(apartment => {
+            const select = document.getElementById("availableMeters");
+            const assignBtn = document.getElementById("assignMeterBtn");
+            const msg = document.getElementById("meterAssignMessage");
 
-            const button = document.createElement("button");
-
-            button.innerText =
-                `${apartment.street} ${apartment.buildingNumber}/${apartment.apartmentNumber}`;
-
-            button.onclick = () => selectApartment(apartment.id);
-
-            container.appendChild(button);
-        });
-    }
-
-    async function loadCurrentMeter() {
-
-        const res = await fetch(
-            `/national-energy-platform/api/electric-meters/apartment/${selectedApartmentId}`
-        );
-
-        const div = document.getElementById("currentMeter");
-
-        if (!res.ok) {
-            div.innerText = "No meter assigned";
-            return;
-        }
-
-        const meter = await res.json();
-
-        div.innerText =
-            `${meter.serialNumber} (${meter.typeName}, ${meter.phaseCount} Phase)`;
-    }
-
-    async function loadAvailableMeters(apartmentId) {
-
-        const select = document.getElementById("availableMeters");
-        const assignBtn = document.getElementById("assignMeterBtn");
-        const msg = document.getElementById("meterAssignMessage");
-
-        const assignSection = document.getElementById("assignMeterSection");
-
-        assignSection.classList.remove("hidden");
-        msg.innerText = "";
-        select.innerHTML = "";
-
-        selectedApartmentId = apartmentId;
-
-        const currentRes = await fetch(
-            `/national-energy-platform/api/electric-meters/apartment/${apartmentId}`
-        );
-
-        if (currentRes.ok) {
-            const current = await currentRes.json();
-
-            msg.innerText = `Current meter: ${current.serialNumber}`;
-            assignBtn.disabled = true;
+            const assignSection = document.getElementById("assignMeterSection");
 
             assignSection.classList.add("hidden");
+            msg.innerText = "";
+            select.innerHTML = "";
 
-            return;
-        }
+            selectedApartmentId = apartmentId;
 
-        const availableRes = await fetch(
-            "/national-energy-platform/api/electric-meters/available"
-        );
+            const currentRes = await fetch(
+                `/national-energy-platform/api/electric-meters/apartment/${apartmentId}`
+            );
 
-        if (!availableRes.ok) {
-            msg.innerText = "Failed to load available meters";
-            assignBtn.disabled = true;
-            return;
-        }
+            if (currentRes.ok) {
+                const current = await currentRes.json();
 
-        const meters = await availableRes.json();
+                msg.innerText = `Current meter: ${current.serialNumber}`;
+                assignBtn.disabled = true;
 
-        if (meters.length === 0) {
-            msg.innerText = "No unassigned meters available";
-            assignBtn.disabled = true;
-            return;
-        }
+                assignSection.classList.add("hidden");
 
-        meters.forEach(meter => {
-            const option = document.createElement("option");
-            option.value = meter.id;
-            option.text = `${meter.serialNumber} (${meter.typeName})`;
-            select.appendChild(option);
-        });
-
-        assignBtn.disabled = false;
-    }
-
-    async function assignMeter() {
-
-        const meterId =
-            Number(document.getElementById("availableMeters").value);
-
-        const res = await fetch(
-            `/national-energy-platform/api/electric-meters/apartments/${selectedApartmentId}`,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    meterId: meterId
-                })
+                return;
             }
-        );
 
-        document.getElementById("meterAssignMessage").innerText =
-            res.ok
-                ? "Meter assigned successfully"
-                : await res.text();
+            const availableRes = await fetch(
+                "/national-energy-platform/api/electric-meters/available"
+            );
 
-        if (res.ok) {
-            await loadCurrentMeter();
-            await loadAvailableMeters(selectedApartmentId);
-        }
-    }
-
-    async function removeMeter() {
-
-        const res = await fetch(
-            `/national-energy-platform/api/electric-meters/apartments/${selectedApartmentId}`,
-            {
-                method: "DELETE"
+            if (!availableRes.ok) {
+                msg.innerText = "Failed to load available meters";
+                assignBtn.disabled = true;
+                return;
             }
-        );
 
-        const msg = document.getElementById("meterAssignMessage");
+            const meters = await availableRes.json();
 
-        if (res.ok) {
-            msg.innerText = "Meter removed successfully";
+            if (meters.length === 0) {
+                msg.innerText = "No unassigned meters available";
+                assignBtn.disabled = true;
+                return;
+            }
+
+            meters.forEach(meter => {
+                assignSection.classList.remove("hidden");
+                const option = document.createElement("option");
+                option.value = meter.id;
+                option.text = `${meter.serialNumber} (${meter.typeName})`;
+                select.appendChild(option);
+            });
+
+            assignBtn.disabled = false;
+        }
+
+        async function assignMeter() {
+
+            const meterId =
+                Number(document.getElementById("availableMeters").value);
+
+            const res = await fetch(
+                `/national-energy-platform/api/electric-meters/apartments/${selectedApartmentId}`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        meterId: meterId
+                    })
+                }
+            );
+
+            document.getElementById("meterAssignMessage").innerText =
+                res.ok
+                    ? "Meter assigned successfully"
+                    : await res.text();
+
+            if (res.ok) {
+                await loadCurrentMeter();
+                await loadAvailableMeters(selectedApartmentId);
+            }
+        }
+
+        async function removeMeter() {
+
+            const res = await fetch(
+                `/national-energy-platform/api/electric-meters/apartments/${selectedApartmentId}`,
+                {
+                    method: "DELETE"
+                }
+            );
+
+            const msg = document.getElementById("meterAssignMessage");
+
+            if (res.ok) {
+                msg.innerText = "Meter removed successfully";
+                await loadCurrentMeter();
+                await loadAvailableMeters(selectedApartmentId);
+                return;
+            }
+
+            const errorText = await res.text();
+
+            try {
+                const parsed = JSON.parse(errorText);
+                msg.innerText = parsed.message || errorText;
+            } catch {
+                msg.innerText = errorText;
+            }
+        }
+
+        async function selectApartment(apartmentId) {
+
+            selectedApartmentId = apartmentId;
+
+            document.getElementById("meterSection")
+                .classList.remove("hidden");
+
             await loadCurrentMeter();
-            await loadAvailableMeters(selectedApartmentId);
-            return;
+            await loadAvailableMeters(apartmentId);
         }
 
-        const errorText = await res.text();
+        async function assignRole() {
+          const roleId = document.getElementById("roleSelect").value;
 
-        try {
-            const parsed = JSON.parse(errorText);
-            msg.innerText = parsed.message || errorText;
-        } catch {
-            msg.innerText = errorText;
-        }
-    }
+          const res = await fetch("/national-energy-platform/api/users/role", {
+              method: "POST",
+              headers: {"Content-Type": "application/json"},
+              body: JSON.stringify({
+                  userId: currentUserId,
+                  roleId: Number(roleId)
+              })
+          });
 
-    async function selectApartment(apartmentId) {
+          document.getElementById("assignMessage").innerText =
+              res.ok ? "Role assigned successfully" : "Failed to assign role";
 
-        selectedApartmentId = apartmentId;
-
-        document.getElementById("meterSection")
-            .classList.remove("hidden");
-
-        await loadCurrentMeter();
-        await loadAvailableMeters(apartmentId);
-    }
-
-    async function assignRole() {
-      const roleId = document.getElementById("roleSelect").value;
-
-      const res = await fetch("/national-energy-platform/api/users/role", {
-          method: "POST",
-          headers: {"Content-Type": "application/json"},
-          body: JSON.stringify({
-              userId: currentUserId,
-              roleId: Number(roleId)
-          })
-      });
-
-      document.getElementById("assignMessage").innerText =
-          res.ok ? "Role assigned successfully" : "Failed to assign role";
-
-      searchUser();
-  }
-
-  async function removeRole(roleId) {
-      const res = await fetch("/national-energy-platform/api/users/role", {
-          method: "DELETE",
-          headers: {"Content-Type": "application/json"},
-          body: JSON.stringify({
-              userId: currentUserId,
-              roleId: roleId
-          })
-      });
-
-      document.getElementById("assignMessage").innerText =
-          res.ok ? "Role removed successfully" : "Failed to remove role";
-
-      searchUser();
-  }
-
-  async function loadMeterTypes() {
-      const res = await fetch("/national-energy-platform/api/electric-meters/types");
-
-      if (!res.ok) {
-          document.getElementById("meterMessage").innerText =
-              "Failed to load meter types";
-          return;
+          searchUser();
       }
 
-      const data = await res.json();
+      async function removeRole(roleId) {
+          const res = await fetch("/national-energy-platform/api/users/role", {
+              method: "DELETE",
+              headers: {"Content-Type": "application/json"},
+              body: JSON.stringify({
+                  userId: currentUserId,
+                  roleId: roleId
+              })
+          });
 
-      const select = document.getElementById("meterType");
-      select.innerHTML = "";
+          document.getElementById("assignMessage").innerText =
+              res.ok ? "Role removed successfully" : "Failed to remove role";
 
-      const placeholder = document.createElement("option");
-      placeholder.value = "";
-      placeholder.text = "-- Select Type --";
-      placeholder.selected = true;
-      placeholder.disabled = true;
-      select.appendChild(placeholder);
-
-      data.forEach(t => {
-          const opt = document.createElement("option");
-          opt.value = t.id;
-          opt.text = t.name;
-          select.appendChild(opt);
-      });
-  }
-
-  async function createMeter() {
-
-      const serialNumber = document.getElementById("meterSerial").value.trim();
-      const phaseCount = document.getElementById("meterPhase").value;
-      const typeId = document.getElementById("meterType").value;
-
-      const msg = document.getElementById("meterMessage");
-
-      msg.innerText = "";
-
-      const errors = [];
-
-      if (!serialNumber) errors.push("Serial number is required");
-      if (!phaseCount) errors.push("Phase count is required");
-      if (!typeId) errors.push("Type is required");
-
-      if (errors.length > 0) {
-          msg.innerText = errors.join("\n");
-          return;
+          searchUser();
       }
 
-      const res = await fetch("/national-energy-platform/api/electric-meters", {
-          method: "POST",
-          headers: {"Content-Type": "application/json"},
-          body: JSON.stringify({
-              serialNumber,
-              phaseCount: Number(phaseCount),
-              typeId: Number(typeId)
-          })
-      });
+      async function loadMeterTypes() {
+          const res = await fetch("/national-energy-platform/api/electric-meters/types");
 
-      if (res.ok) {
-          document.getElementById("meterSerial").value = "";
-          document.getElementById("meterPhase").selectedIndex = 0;
-          document.getElementById("meterType").selectedIndex = 0;
-          msg.innerText = "Meter created successfully";
-      } else {
+          if (!res.ok) {
+              document.getElementById("meterMessage").innerText =
+                  "Failed to load meter types";
+              return;
+          }
 
-          let errText = await res.text();
+          const data = await res.json();
 
-          try {
-              const parsed = JSON.parse(errText);
+          const select = document.getElementById("meterType");
+          select.innerHTML = "";
 
-              if (parsed.errors) {
-                  msg.innerText = Object.values(parsed.errors).join("\n");
-              } else {
-                  msg.innerText = parsed.message || errText;
+          const placeholder = document.createElement("option");
+          placeholder.value = "";
+          placeholder.text = "-- Select Type --";
+          placeholder.selected = true;
+          placeholder.disabled = true;
+          select.appendChild(placeholder);
+
+          data.forEach(t => {
+              const opt = document.createElement("option");
+              opt.value = t.id;
+              opt.text = t.name;
+              select.appendChild(opt);
+          });
+      }
+
+      async function createMeter() {
+
+          const serialNumber = document.getElementById("meterSerial").value.trim();
+          const phaseCount = document.getElementById("meterPhase").value;
+          const typeId = document.getElementById("meterType").value;
+
+          const msg = document.getElementById("meterMessage");
+
+          msg.innerText = "";
+
+          const errors = [];
+
+          if (!serialNumber) errors.push("Serial number is required");
+          if (!phaseCount) errors.push("Phase count is required");
+          if (!typeId) errors.push("Type is required");
+
+          if (errors.length > 0) {
+              msg.innerText = errors.join("\n");
+              return;
+          }
+
+          const res = await fetch("/national-energy-platform/api/electric-meters", {
+              method: "POST",
+              headers: {"Content-Type": "application/json"},
+              body: JSON.stringify({
+                  serialNumber,
+                  phaseCount: Number(phaseCount),
+                  typeId: Number(typeId)
+              })
+          });
+
+          if (res.ok) {
+              document.getElementById("meterSerial").value = "";
+              document.getElementById("meterPhase").selectedIndex = 0;
+              document.getElementById("meterType").selectedIndex = 0;
+              msg.innerText = "Meter created successfully";
+          } else {
+
+              let errText = await res.text();
+
+              try {
+                  const parsed = JSON.parse(errText);
+
+                  if (parsed.errors) {
+                      msg.innerText = Object.values(parsed.errors).join("\n");
+                  } else {
+                      msg.innerText = parsed.message || errText;
+                  }
+              } catch {
+                  msg.innerText = errText;
               }
-          } catch {
-              msg.innerText = errText;
           }
       }
-  }
-</script>
+    </script>
 
-</body>
-</html>
+    </body>
+    </html>

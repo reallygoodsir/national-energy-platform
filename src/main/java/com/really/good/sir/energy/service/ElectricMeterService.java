@@ -79,8 +79,7 @@ public class ElectricMeterService {
                 .orElseThrow(() ->
                         new ElectricMeterNotFoundException(request.getMeterId()));
 
-        electricMeterMapper.assignApartment(meter, apartment);
-
+        meter.setApartment(apartment);
         meterRepository.save(meter);
     }
 
@@ -92,8 +91,7 @@ public class ElectricMeterService {
                                 "No electric meter is assigned to apartment with ID " + apartmentId
                         ));
 
-        electricMeterMapper.removeApartment(meter);
-
+        meter.setApartment(null);
         meterRepository.save(meter);
     }
 
