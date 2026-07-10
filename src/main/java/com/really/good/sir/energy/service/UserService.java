@@ -123,4 +123,16 @@ public class UserService {
         UserEntity user = findByEmail(email);
         return userMapper.toUserResponse(user);
     }
+
+    public List<ApartmentResponse> getCurrentUserApartmentsWithMeter(String email) {
+
+        UserEntity user = findByEmail(email);
+
+        List<ApartmentEntity> apartments =
+                apartmentRepository.findAllByUserIdWithMeterAssigned(user.getId());
+
+        return apartments.stream()
+                .map(apartmentMapper::toResponse)
+                .toList();
+    }
 }

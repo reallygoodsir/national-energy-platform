@@ -45,4 +45,9 @@ public class UserController {
     public List<ApartmentResponse> getUserApartments(@PathVariable Long userId) {
         return userService.getUserApartments(userId);
     }
+
+    @GetMapping("/current/apartments")
+    public List<ApartmentResponse> getCurrentUserApartments(Authentication authentication) {
+        return userService.getCurrentUserApartmentsWithMeter(authentication.getName());
+    }
 }

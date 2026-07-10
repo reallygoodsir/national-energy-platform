@@ -161,4 +161,30 @@ public class GlobalExceptionHandler {
                         ex.getMessage()
                 ));
     }
+
+    @ExceptionHandler(ApartmentAccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleApartmentAccessDenied(
+            ApartmentAccessDeniedException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(new ErrorResponse(
+                        LocalDateTime.now(),
+                        HttpStatus.FORBIDDEN.value(),
+                        ex.getMessage()
+                ));
+    }
+
+    @ExceptionHandler(InvalidReadingValueException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidMeterReading(
+            InvalidReadingValueException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(
+                        LocalDateTime.now(),
+                        HttpStatus.BAD_REQUEST.value(),
+                        ex.getMessage()
+                ));
+    }
 }
