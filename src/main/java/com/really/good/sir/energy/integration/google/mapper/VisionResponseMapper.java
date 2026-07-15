@@ -1,13 +1,14 @@
-package com.really.good.sir.energy.client;
+package com.really.good.sir.energy.integration.google.mapper;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.really.good.sir.energy.integration.google.dto.response.DetectedTextBlock;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class VisionResponseParser {
+public class VisionResponseMapper {
 
     public List<DetectedTextBlock> parse(JsonNode response) {
 
@@ -18,11 +19,10 @@ public class VisionResponseParser {
                 .path("textAnnotations");
 
         if (!annotations.isArray() || annotations.isEmpty()) {
-            System.out.println("[VisionResponseParser] No text annotations found in response");
+            System.out.println("[VisionResponseMapper] No text annotations found in response");
             return blocks;
         }
 
-        // Index 0 is the full detected text blob; individual words/segments start at index 1.
         for (int i = 1; i < annotations.size(); i++) {
             JsonNode annotation = annotations.get(i);
             String text = annotation.path("description").asText();

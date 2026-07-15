@@ -1,4 +1,4 @@
-package com.really.good.sir.energy.client;
+package com.really.good.sir.energy.integration.google.dto.response;
 
 public class DetectedTextBlock {
 

@@ -1,6 +1,9 @@
-package com.really.good.sir.energy.client;
+package com.really.good.sir.energy.integration.google.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.really.good.sir.energy.integration.google.dto.request.VisionAnnotateRequestBody;
+import com.really.good.sir.energy.integration.google.mapper.VisionResponseMapper;
+import com.really.good.sir.energy.integration.google.dto.response.DetectedTextBlock;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -8,20 +11,19 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Base64;
 import java.util.List;
 
 @Component
 public class VisionOcrClient {
 
     private final RestTemplate restTemplate;
-    private final VisionResponseParser responseParser;
+    private final VisionResponseMapper responseParser;
     private final String apiKey;
     private final String endpoint;
 
     public VisionOcrClient(
             RestTemplate restTemplate,
-            VisionResponseParser responseParser,
+            VisionResponseMapper responseParser,
             @Value("${google.vision.api-key}") String apiKey,
             @Value("${google.vision.endpoint}") String endpoint
     ) {
@@ -35,21 +37,12 @@ public class VisionOcrClient {
 
         System.out.println("[VisionOcrClient] Sending image to Vision API, size=" + imageBytes.length + " bytes");
 
-        String base64Image = Base64.getEncoder().encodeToString(imageBytes);
-
-        String requestBody = """
-                {
-                  "requests": [{
-                    "image": { "content": "%s" },
-                    "features": [{ "type": "TEXT_DETECTION" }]
-                  }]
-                }
-                """.formatted(base64Image);
+        VisionAnnotateRequestBody requestBody = VisionAnnotateRequestBody.forTextDetection(imageBytes);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<String> httpEntity = new HttpEntity<>(requestBody, headers);
+        HttpEntity<VisionAnnotateRequestBody> httpEntity = new HttpEntity<>(requestBody, headers);
 
         String url = endpoint + "?key=" + apiKey;
 

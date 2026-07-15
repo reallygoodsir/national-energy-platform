@@ -1,7 +1,7 @@
 package com.really.good.sir.energy.service;
 
-import com.really.good.sir.energy.client.DetectedTextBlock;
-import com.really.good.sir.energy.client.VisionOcrClient;
+import com.really.good.sir.energy.integration.google.dto.response.DetectedTextBlock;
+import com.really.good.sir.energy.integration.google.client.VisionOcrClient;
 import com.really.good.sir.energy.dto.response.MeterScanResponse;
 import com.really.good.sir.energy.entity.ApartmentEntity;
 import com.really.good.sir.energy.exception.ApartmentAccessDeniedException;
