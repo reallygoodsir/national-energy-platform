@@ -14,11 +14,16 @@ spring:
     hibernate:
       ddl-auto: update
 
-    show-sql: true
+    show-sql: false
 
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
+
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
 
 server:
   port: 8080
@@ -29,3 +34,8 @@ server:
     include-message: always
     include-binding-errors: always
     include-stacktrace: always
+
+google:
+  vision:
+    api-key: ${GOOGLE_VISION_API_KEY}
+    endpoint: https://vision.googleapis.com/v1/images:annotate

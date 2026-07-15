@@ -187,4 +187,17 @@ public class GlobalExceptionHandler {
                         ex.getMessage()
                 ));
     }
+
+    @ExceptionHandler(MeterReadingNotDetectedException.class)
+    public ResponseEntity<ErrorResponse> handleReadingNotDetected(
+            MeterReadingNotDetectedException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(new ErrorResponse(
+                        LocalDateTime.now(),
+                        HttpStatus.UNPROCESSABLE_ENTITY.value(),
+                        ex.getMessage()
+                ));
+    }
 }

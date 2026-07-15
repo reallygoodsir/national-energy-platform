@@ -89,6 +89,20 @@
             cursor: not-allowed;
         }
 
+        .button-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .secondary-button {
+            background: #1f2937;
+        }
+
+        .secondary-button:hover {
+            background: #334155;
+        }
+
         .box {
             margin-top: 20px;
             padding: 15px;
@@ -202,7 +216,14 @@
                 <div class="section-title">Submit New Reading</div>
                 <input type="number" step="0.01" id="readingValue" placeholder="Current meter value">
 
-                <button onclick="submitReading()">Submit Reading</button>
+                <div class="button-row">
+                    <button onclick="submitReading()">Submit Reading</button>
+                    <button class="secondary-button" onclick="triggerScanUpload()">Scan Meter Photo</button>
+                </div>
+
+                <input type="file" id="scanFileInput" accept="image/*" class="hidden" onchange="scanMeterPhoto()">
+
+                <div id="scanMessage"></div>
 
                 <div id="readingMessage"></div>
             </div>
@@ -350,6 +371,7 @@
         buttonEl.classList.add("active");
 
         document.getElementById("readingMessage").innerText = "";
+        document.getElementById("scanMessage").innerText = "";
         document.getElementById("readingValue").value = "";
         document.getElementById("meterBox").classList.remove("hidden");
         document.getElementById("meterApartmentTitle").innerText = buttonEl.innerText;
@@ -440,6 +462,69 @@
             msg.innerText = "Reading submitted successfully";
             document.getElementById("readingValue").value = "";
             await loadLastReading(selectedApartmentId);
+        } else {
+            msg.className = "error";
+            let errText = await res.text();
+
+            try {
+                const parsed = JSON.parse(errText);
+                msg.innerText = parsed.message || errText;
+            } catch {
+                msg.innerText = errText;
+            }
+        }
+    }
+
+    /* ---------- SCAN METER PHOTO ---------- */
+
+    function triggerScanUpload() {
+
+        if (!selectedApartmentId) {
+            const msg = document.getElementById("scanMessage");
+            msg.className = "error";
+            msg.innerText = "Select an apartment first";
+            return;
+        }
+
+        document.getElementById("scanFileInput").click();
+    }
+
+    async function scanMeterPhoto() {
+
+        const fileInput = document.getElementById("scanFileInput");
+        const msg = document.getElementById("scanMessage");
+
+        msg.className = "";
+        msg.innerText = "";
+
+        const file = fileInput.files[0];
+
+        if (!file) {
+            return;
+        }
+
+        msg.className = "muted";
+        msg.innerText = "Scanning photo...";
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const res = await fetch(
+            `${BASE}/api/apartments/${selectedApartmentId}/readings/scan`,
+            {
+                method: "POST",
+                credentials: "include",
+                body: formData
+            }
+        );
+
+        fileInput.value = "";
+
+        if (res.ok) {
+            const data = await res.json();
+            document.getElementById("readingValue").value = data.detectedValue;
+            msg.className = "success";
+            msg.innerText = "Detected value filled in below — confirm or edit it, then submit.";
         } else {
             msg.className = "error";
             let errText = await res.text();

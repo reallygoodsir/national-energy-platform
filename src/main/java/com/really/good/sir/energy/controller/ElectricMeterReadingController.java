@@ -3,11 +3,15 @@ package com.really.good.sir.energy.controller;
 import com.really.good.sir.energy.dto.request.ElectricMeterReadingRequest;
 import com.really.good.sir.energy.dto.response.ElectricMeterReadingResponse;
 import com.really.good.sir.energy.dto.response.ElectricMeterUsageResponse;
+import com.really.good.sir.energy.dto.response.MeterScanResponse;
 import com.really.good.sir.energy.service.ElectricMeterReadingService;
+import com.really.good.sir.energy.service.MeterScanService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -16,9 +20,10 @@ import java.util.List;
 public class ElectricMeterReadingController {
 
     private final ElectricMeterReadingService readingService;
-
-    public ElectricMeterReadingController(ElectricMeterReadingService readingService) {
+    private final MeterScanService meterScanService;
+    public ElectricMeterReadingController(ElectricMeterReadingService readingService, MeterScanService meterScanService) {
         this.readingService = readingService;
+        this.meterScanService = meterScanService;
     }
 
     @PostMapping("/{apartmentId}/readings")
@@ -45,5 +50,14 @@ public class ElectricMeterReadingController {
             Authentication authentication) {
 
         return readingService.getUsage(apartmentId, authentication.getName());
+    }
+
+    @PostMapping(value = "/{apartmentId}/readings/scan", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public MeterScanResponse scan(
+            @PathVariable Long apartmentId,
+            @RequestParam("file") MultipartFile file,
+            Authentication authentication) {
+
+        return meterScanService.scan(apartmentId, file, authentication.getName());
     }
 }
