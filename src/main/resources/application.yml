@@ -39,3 +39,7 @@ google:
   vision:
     api-key: ${GOOGLE_VISION_API_KEY}
     endpoint: https://vision.googleapis.com/v1/images:annotate
+
+logging:
+  file:
+    path: logs

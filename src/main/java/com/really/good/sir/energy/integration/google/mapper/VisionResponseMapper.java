@@ -2,6 +2,8 @@ package com.really.good.sir.energy.integration.google.mapper;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.really.good.sir.energy.integration.google.dto.response.DetectedTextBlock;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -9,6 +11,8 @@ import java.util.List;
 
 @Component
 public class VisionResponseMapper {
+
+    private static final Logger log = LoggerFactory.getLogger(VisionResponseMapper.class);
 
     public List<DetectedTextBlock> parse(JsonNode response) {
 
@@ -19,7 +23,7 @@ public class VisionResponseMapper {
                 .path("textAnnotations");
 
         if (!annotations.isArray() || annotations.isEmpty()) {
-            System.out.println("[VisionResponseMapper] No text annotations found in response");
+            log.warn("No text annotations found in Vision API response");
             return blocks;
         }
 

@@ -5,11 +5,15 @@ import com.really.good.sir.energy.entity.*;
 import com.really.good.sir.energy.exception.UserNotFoundException;
 import com.really.good.sir.energy.mapper.UserLocationMapper;
 import com.really.good.sir.energy.repository.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserLocationService {
+
+    private static final Logger log = LoggerFactory.getLogger(UserLocationService.class);
 
     private final UserRepository userRepository;
     private final CityRepository cityRepository;
@@ -55,5 +59,9 @@ public class UserLocationService {
         apartment.setUser(user);
 
         apartmentRepository.save(apartment);
+
+        log.info("Location assigned, userId={}, city={}, street={}, building={}, apartment={}",
+                userId, request.getCity(), request.getStreet(),
+                request.getBuildingNumber(), request.getApartmentNumber());
     }
 }

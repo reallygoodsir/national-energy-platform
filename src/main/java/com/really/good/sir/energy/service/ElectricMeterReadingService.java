@@ -14,6 +14,8 @@ import com.really.good.sir.energy.mapper.ElectricMeterReadingMapper;
 import com.really.good.sir.energy.repository.ApartmentRepository;
 import com.really.good.sir.energy.repository.ElectricMeterReadingRepository;
 import com.really.good.sir.energy.repository.ElectricMeterRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -22,6 +24,8 @@ import java.util.List;
 
 @Service
 public class ElectricMeterReadingService {
+
+    private static final Logger log = LoggerFactory.getLogger(ElectricMeterReadingService.class);
 
     private final ElectricMeterReadingRepository readingRepository;
     private final ElectricMeterRepository meterRepository;
@@ -55,11 +59,16 @@ public class ElectricMeterReadingService {
             ElectricMeterReadingRequest request,
             String requesterEmail) {
 
+        log.info("Reading submission attempt, apartmentId={}, value={}, user={}",
+                apartmentId, request.getValue(), requesterEmail);
+
         ElectricMeterEntity meter = resolveOwnedMeter(apartmentId, requesterEmail);
 
         readingRepository.findTopByMeterIdOrderByReadingDateDesc(meter.getId())
                 .ifPresent(lastReading -> {
                     if (request.getValue() < lastReading.getValue()) {
+                        log.warn("Reading rejected, new value={} lower than last value={}, meterId={}",
+                                request.getValue(), lastReading.getValue(), meter.getId());
                         throw new InvalidReadingValueException(request.getValue(), lastReading.getValue());
                     }
                 });
@@ -71,23 +80,9 @@ public class ElectricMeterReadingService {
 
         ElectricMeterReadingEntity saved = readingRepository.save(reading);
 
+        log.info("Reading saved, readingId={}, meterId={}, value={}", saved.getId(), meter.getId(), saved.getValue());
+
         return readingMapper.toResponse(saved);
-    }
-
-    private ElectricMeterEntity resolveOwnedMeter(Long apartmentId, String requesterEmail) {
-
-        ApartmentEntity apartment = apartmentRepository.findById(apartmentId)
-                .orElseThrow(() -> new ApartmentNotFoundException(apartmentId));
-
-        if (!apartment.getUser().getEmail().equals(requesterEmail)) {
-            throw new ApartmentAccessDeniedException(apartmentId);
-        }
-
-        return meterRepository.findByApartmentId(apartmentId)
-                .orElseThrow(() ->
-                        new ElectricMeterNotFoundException(
-                                "No electric meter is assigned to apartment with ID " + apartmentId
-                        ));
     }
 
     public List<ElectricMeterUsageResponse> getUsage(Long apartmentId, String requesterEmail) {
@@ -105,6 +100,25 @@ public class ElectricMeterReadingService {
             usage.add(readingMapper.toUsageResponse(older, newer));
         }
 
+        log.info("Computed {} usage period(s) for meterId={}", usage.size(), meter.getId());
+
         return usage;
+    }
+
+    private ElectricMeterEntity resolveOwnedMeter(Long apartmentId, String requesterEmail) {
+
+        ApartmentEntity apartment = apartmentRepository.findById(apartmentId)
+                .orElseThrow(() -> new ApartmentNotFoundException(apartmentId));
+
+        if (!apartment.getUser().getEmail().equals(requesterEmail)) {
+            log.warn("User={} attempted to access apartmentId={} they do not own", requesterEmail, apartmentId);
+            throw new ApartmentAccessDeniedException(apartmentId);
+        }
+
+        return meterRepository.findByApartmentId(apartmentId)
+                .orElseThrow(() ->
+                        new ElectricMeterNotFoundException(
+                                "No electric meter is assigned to apartment with ID " + apartmentId
+                        ));
     }
 }

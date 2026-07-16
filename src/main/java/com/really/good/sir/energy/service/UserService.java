@@ -18,6 +18,8 @@ import com.really.good.sir.energy.mapper.UserMapper;
 import com.really.good.sir.energy.repository.ApartmentRepository;
 import com.really.good.sir.energy.repository.RoleRepository;
 import com.really.good.sir.energy.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,6 +27,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserService {
+
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -49,9 +53,15 @@ public class UserService {
     }
 
     public SearchUserResponse search(String searchValue) {
+
+        log.info("Searching user by value={}", searchValue);
+
         UserEntity user = userRepository.findByEmail(searchValue)
                 .or(() -> userRepository.findByPhoneNumber(searchValue))
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+                .orElseThrow(() -> {
+                    log.warn("User search found no match for value={}", searchValue);
+                    return new UserNotFoundException("User not found");
+                });
 
         List<RoleResponse> assignedRoles = user.getRoles()
                 .stream()
@@ -72,6 +82,7 @@ public class UserService {
     }
 
     public void assignRole(RoleRequest request) {
+
         UserEntity user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
@@ -79,14 +90,18 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("Role not found"));
 
         if (user.getRoles().contains(role)) {
+            log.warn("Role already assigned, userId={}, roleId={}", request.getUserId(), request.getRoleId());
             throw new RoleAlreadyAssignedException("Role already assigned");
         }
 
         user.getRoles().add(role);
         userRepository.save(user);
+
+        log.info("Role assigned, userId={}, roleId={}", request.getUserId(), request.getRoleId());
     }
 
     public void removeRole(RoleRequest request) {
+
         UserEntity user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
@@ -94,11 +109,14 @@ public class UserService {
                 .orElseThrow(() -> new RoleNotFoundException("Role not found"));
 
         if (!user.getRoles().contains(role)) {
+            log.warn("Role not assigned, cannot remove, userId={}, roleId={}", request.getUserId(), request.getRoleId());
             throw new RoleNotAssignedException("Role is not assigned to user");
         }
 
         user.getRoles().remove(role);
         userRepository.save(user);
+
+        log.info("Role removed, userId={}, roleId={}", request.getUserId(), request.getRoleId());
     }
 
     public UserEntity findByEmail(String email) {
@@ -113,6 +131,8 @@ public class UserService {
 
         List<ApartmentEntity> apartments =
                 apartmentRepository.findAllByUserId(user.getId());
+
+        log.info("Loaded {} apartment(s) for userId={}", apartments.size(), userId);
 
         return apartments.stream()
                 .map(apartmentMapper::toResponse)
@@ -130,6 +150,8 @@ public class UserService {
 
         List<ApartmentEntity> apartments =
                 apartmentRepository.findAllByUserIdWithMeterAssigned(user.getId());
+
+        log.info("Loaded {} metered apartment(s) for email={}", apartments.size(), email);
 
         return apartments.stream()
                 .map(apartmentMapper::toResponse)
