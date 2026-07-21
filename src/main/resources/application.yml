@@ -1,7 +1,4 @@
 spring:
-  session:
-    jdbc:
-      initialize-schema: never
   application:
     name: national-energy-platform
 
