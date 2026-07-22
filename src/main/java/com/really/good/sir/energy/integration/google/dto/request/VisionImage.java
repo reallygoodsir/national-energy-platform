@@ -2,7 +2,7 @@ package com.really.good.sir.energy.integration.google.dto.request;
 
 import java.util.Base64;
 
-public class VisionImage {
+public final class VisionImage {
 
     private final String content;
 

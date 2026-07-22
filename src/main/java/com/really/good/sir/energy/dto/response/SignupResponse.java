@@ -6,7 +6,8 @@ public class SignupResponse {
     private String fullName;
     private String email;
 
-    public SignupResponse() {}
+    public SignupResponse() {
+    }
 
     public SignupResponse(Long id, String fullName, String email) {
         this.id = id;

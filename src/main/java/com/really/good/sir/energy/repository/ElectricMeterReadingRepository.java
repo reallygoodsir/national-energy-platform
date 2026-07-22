@@ -8,6 +8,8 @@ import java.util.Optional;
 
 public interface ElectricMeterReadingRepository extends JpaRepository<ElectricMeterReadingEntity, Long> {
     Optional<ElectricMeterReadingEntity> findTopByMeterIdOrderByReadingDateDesc(Long meterId);
+
     List<ElectricMeterReadingEntity> findByMeterIdOrderByReadingDateDesc(Long meterId);
+
     List<ElectricMeterReadingEntity> findByMeterIdOrderByReadingDateAsc(Long meterId);
 }

@@ -19,9 +19,9 @@ public interface ApartmentRepository extends JpaRepository<ApartmentEntity, Long
     List<ApartmentEntity> findAllByUserId(Long userId);
 
     @Query("""
-        SELECT a FROM ApartmentEntity a
-        WHERE a.user.id = :userId
-        AND EXISTS (SELECT m FROM ElectricMeterEntity m WHERE m.apartment = a)
-    """)
+                SELECT a FROM ApartmentEntity a
+                WHERE a.user.id = :userId
+                AND EXISTS (SELECT m FROM ElectricMeterEntity m WHERE m.apartment = a)
+            """)
     List<ApartmentEntity> findAllByUserIdWithMeterAssigned(@Param("userId") Long userId);
 }

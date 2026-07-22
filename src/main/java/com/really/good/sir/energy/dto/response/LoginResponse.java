@@ -6,7 +6,8 @@ public class LoginResponse {
     private String fullName;
     private String email;
 
-    public LoginResponse() {}
+    public LoginResponse() {
+    }
 
     public LoginResponse(Long id, String fullName, String email) {
         this.id = id;

@@ -2,7 +2,7 @@ package com.really.good.sir.energy.integration.google.dto.request;
 
 import java.util.List;
 
-public class VisionAnnotateRequestBody {
+public final class VisionAnnotateRequestBody {
 
     private final List<VisionImageRequest> requests;
 

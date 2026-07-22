@@ -1,6 +1,6 @@
 package com.really.good.sir.energy.integration.google.dto.request;
 
-public class VisionFeature {
+public final class VisionFeature {
 
     private final String type;
 

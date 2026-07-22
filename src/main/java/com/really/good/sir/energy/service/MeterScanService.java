@@ -1,12 +1,12 @@
 package com.really.good.sir.energy.service;
 
-import com.really.good.sir.energy.integration.google.client.VisionOcrClient;
-import com.really.good.sir.energy.integration.google.dto.response.DetectedTextBlock;
 import com.really.good.sir.energy.dto.response.MeterScanResponse;
 import com.really.good.sir.energy.entity.ApartmentEntity;
 import com.really.good.sir.energy.exception.ApartmentAccessDeniedException;
 import com.really.good.sir.energy.exception.ApartmentNotFoundException;
 import com.really.good.sir.energy.exception.MeterReadingNotDetectedException;
+import com.really.good.sir.energy.integration.google.client.VisionOcrClient;
+import com.really.good.sir.energy.integration.google.dto.response.DetectedTextBlock;
 import com.really.good.sir.energy.repository.ApartmentRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

@@ -1,10 +1,16 @@
 package com.really.good.sir.energy.service;
 
 import com.really.good.sir.energy.dto.request.UserLocationRequest;
-import com.really.good.sir.energy.entity.*;
+import com.really.good.sir.energy.entity.ApartmentEntity;
+import com.really.good.sir.energy.entity.CityEntity;
+import com.really.good.sir.energy.entity.StreetEntity;
+import com.really.good.sir.energy.entity.UserEntity;
 import com.really.good.sir.energy.exception.UserNotFoundException;
 import com.really.good.sir.energy.mapper.UserLocationMapper;
-import com.really.good.sir.energy.repository.*;
+import com.really.good.sir.energy.repository.ApartmentRepository;
+import com.really.good.sir.energy.repository.CityRepository;
+import com.really.good.sir.energy.repository.StreetRepository;
+import com.really.good.sir.energy.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

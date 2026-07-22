@@ -1,6 +1,15 @@
 package com.really.good.sir.energy.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "electric_meters")
@@ -24,7 +33,8 @@ public class ElectricMeterEntity {
     @JoinColumn(name = "apartment_id", unique = true)
     private ApartmentEntity apartment;
 
-    public ElectricMeterEntity() {}
+    public ElectricMeterEntity() {
+    }
 
     public Long getId() {
         return id;

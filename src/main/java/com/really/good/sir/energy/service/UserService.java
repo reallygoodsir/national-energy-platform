@@ -109,7 +109,8 @@ public class UserService {
                 .orElseThrow(() -> new RoleNotFoundException("Role not found"));
 
         if (!user.getRoles().contains(role)) {
-            log.warn("Role not assigned, cannot remove, userId={}, roleId={}", request.getUserId(), request.getRoleId());
+            log.warn("Role not assigned, cannot remove, userId={}, roleId={}",
+                    request.getUserId(), request.getRoleId());
             throw new RoleNotAssignedException("Role is not assigned to user");
         }
 
