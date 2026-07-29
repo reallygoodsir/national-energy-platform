@@ -13,7 +13,7 @@ public class ElectricMeterReadingRequest {
         return value;
     }
 
-    public void setValue(Double value) {
+    public void setValue(final Double value) {
         this.value = value;
     }
 }

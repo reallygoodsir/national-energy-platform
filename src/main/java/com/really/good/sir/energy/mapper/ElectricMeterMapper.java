@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ElectricMeterMapper {
 
-    public ElectricMeterResponse toResponse(ElectricMeterEntity meter) {
+    public ElectricMeterResponse toResponse(final ElectricMeterEntity meter) {
         return new ElectricMeterResponse(
                 meter.getId(),
                 meter.getSerialNumber(),
@@ -18,7 +18,7 @@ public class ElectricMeterMapper {
         );
     }
 
-    public ElectricMeterTypeResponse toTypeResponse(ElectricMeterTypeEntity type) {
+    public ElectricMeterTypeResponse toTypeResponse(final ElectricMeterTypeEntity type) {
         return new ElectricMeterTypeResponse(
                 type.getId(),
                 type.getName()

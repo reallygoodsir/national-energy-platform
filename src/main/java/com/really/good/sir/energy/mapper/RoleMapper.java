@@ -9,7 +9,7 @@ import java.util.List;
 @Service
 public class RoleMapper {
 
-    public RoleResponse toRoleResponse(RoleEntity role) {
+    public RoleResponse toRoleResponse(final RoleEntity role) {
         return new RoleResponse(
                 role.getId(),
                 role.getName(),
@@ -17,7 +17,7 @@ public class RoleMapper {
         );
     }
 
-    public List<RoleResponse> toRolesResponse(List<RoleEntity> entities) {
+    public List<RoleResponse> toRolesResponse(final List<RoleEntity> entities) {
         return entities.stream()
                 .map(this::toRoleResponse)
                 .toList();

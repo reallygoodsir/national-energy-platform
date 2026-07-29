@@ -6,14 +6,14 @@ public final class VisionAnnotateRequestBody {
 
     private final List<VisionImageRequest> requests;
 
-    private VisionAnnotateRequestBody(List<VisionImageRequest> requests) {
+    private VisionAnnotateRequestBody(final List<VisionImageRequest> requests) {
         this.requests = requests;
     }
 
-    public static VisionAnnotateRequestBody forTextDetection(byte[] imageBytes) {
-        VisionImage image = VisionImage.fromBytes(imageBytes);
-        VisionFeature feature = VisionFeature.textDetection();
-        VisionImageRequest request = new VisionImageRequest(image, List.of(feature));
+    public static VisionAnnotateRequestBody forTextDetection(final byte[] imageBytes) {
+        final VisionImage image = VisionImage.fromBytes(imageBytes);
+        final VisionFeature feature = VisionFeature.textDetection();
+        final VisionImageRequest request = new VisionImageRequest(image, List.of(feature));
         return new VisionAnnotateRequestBody(List.of(request));
     }
 

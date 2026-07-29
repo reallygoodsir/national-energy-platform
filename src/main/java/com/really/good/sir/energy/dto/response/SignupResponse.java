@@ -9,7 +9,7 @@ public class SignupResponse {
     public SignupResponse() {
     }
 
-    public SignupResponse(Long id, String fullName, String email) {
+    public SignupResponse(final Long id, final String fullName, final String email) {
         this.id = id;
         this.fullName = fullName;
         this.email = email;

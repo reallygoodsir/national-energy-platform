@@ -24,37 +24,37 @@ public class UserController {
 
     private final UserService userService;
 
-    public UserController(UserService userService) {
+    public UserController(final UserService userService) {
         this.userService = userService;
     }
 
     @GetMapping("/search")
-    public SearchUserResponse search(@RequestParam String value) {
+    public SearchUserResponse search(@RequestParam final String value) {
         return userService.search(value);
     }
 
     @PostMapping("/role")
-    public void assignRole(@Valid @RequestBody RoleRequest request) {
+    public void assignRole(@Valid @RequestBody final RoleRequest request) {
         userService.assignRole(request);
     }
 
     @DeleteMapping("/role")
-    public void removeRole(@Valid @RequestBody RoleRequest request) {
+    public void removeRole(@Valid @RequestBody final RoleRequest request) {
         userService.removeRole(request);
     }
 
     @GetMapping("/current")
-    public UserResponse getCurrentUser(Authentication authentication) {
+    public UserResponse getCurrentUser(final Authentication authentication) {
         return userService.getCurrentUser(authentication.getName());
     }
 
     @GetMapping("/{userId}/apartments")
-    public List<ApartmentResponse> getUserApartments(@PathVariable Long userId) {
+    public List<ApartmentResponse> getUserApartments(@PathVariable final Long userId) {
         return userService.getUserApartments(userId);
     }
 
     @GetMapping("/current/apartments")
-    public List<ApartmentResponse> getCurrentUserApartments(Authentication authentication) {
+    public List<ApartmentResponse> getCurrentUserApartments(final Authentication authentication) {
         return userService.getCurrentUserApartmentsWithMeter(authentication.getName());
     }
 }

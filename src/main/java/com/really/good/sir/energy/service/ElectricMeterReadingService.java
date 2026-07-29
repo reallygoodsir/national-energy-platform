@@ -25,7 +25,7 @@ import java.util.List;
 @Service
 public class ElectricMeterReadingService {
 
-    private static final Logger log = LoggerFactory.getLogger(ElectricMeterReadingService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ElectricMeterReadingService.class);
 
     private final ElectricMeterReadingRepository readingRepository;
     private final ElectricMeterRepository meterRepository;
@@ -33,10 +33,10 @@ public class ElectricMeterReadingService {
     private final ElectricMeterReadingMapper readingMapper;
 
     public ElectricMeterReadingService(
-            ElectricMeterReadingRepository readingRepository,
-            ElectricMeterRepository meterRepository,
-            ApartmentRepository apartmentRepository,
-            ElectricMeterReadingMapper readingMapper
+            final ElectricMeterReadingRepository readingRepository,
+            final ElectricMeterRepository meterRepository,
+            final ApartmentRepository apartmentRepository,
+            final ElectricMeterReadingMapper readingMapper
     ) {
         this.readingRepository = readingRepository;
         this.meterRepository = meterRepository;
@@ -44,9 +44,9 @@ public class ElectricMeterReadingService {
         this.readingMapper = readingMapper;
     }
 
-    public List<ElectricMeterReadingResponse> getReadings(Long apartmentId, String requesterEmail) {
+    public List<ElectricMeterReadingResponse> getReadings(final Long apartmentId, final String requesterEmail) {
 
-        ElectricMeterEntity meter = resolveOwnedMeter(apartmentId, requesterEmail);
+        final ElectricMeterEntity meter = resolveOwnedMeter(apartmentId, requesterEmail);
 
         return readingRepository.findByMeterIdOrderByReadingDateDesc(meter.getId())
                 .stream()
@@ -55,63 +55,65 @@ public class ElectricMeterReadingService {
     }
 
     public ElectricMeterReadingResponse submitReading(
-            Long apartmentId,
-            ElectricMeterReadingRequest request,
-            String requesterEmail) {
+            final Long apartmentId,
+            final ElectricMeterReadingRequest request,
+            final String requesterEmail) {
 
-        log.info("Reading submission attempt, apartmentId={}, value={}, user={}",
-                apartmentId, request.getValue(), requesterEmail);
+        final Double value = request.getValue();
+        LOGGER.info("Reading submission attempt, apartmentId={}, value={}, user={}",
+                apartmentId, value, requesterEmail);
 
-        ElectricMeterEntity meter = resolveOwnedMeter(apartmentId, requesterEmail);
+        final ElectricMeterEntity meter = resolveOwnedMeter(apartmentId, requesterEmail);
 
         readingRepository.findTopByMeterIdOrderByReadingDateDesc(meter.getId())
                 .ifPresent(lastReading -> {
                     if (request.getValue() < lastReading.getValue()) {
-                        log.warn("Reading rejected, new value={} lower than last value={}, meterId={}",
+                        LOGGER.warn("Reading rejected, new value={} lower than last value={}, meterId={}",
                                 request.getValue(), lastReading.getValue(), meter.getId());
                         throw new InvalidReadingValueException(request.getValue(), lastReading.getValue());
                     }
                 });
 
-        ElectricMeterReadingEntity reading = new ElectricMeterReadingEntity();
+        final ElectricMeterReadingEntity reading = new ElectricMeterReadingEntity();
         reading.setMeter(meter);
         reading.setValue(request.getValue());
         reading.setReadingDate(LocalDateTime.now());
 
-        ElectricMeterReadingEntity saved = readingRepository.save(reading);
+        final ElectricMeterReadingEntity saved = readingRepository.save(reading);
 
-        log.info("Reading saved, readingId={}, meterId={}, value={}", saved.getId(), meter.getId(), saved.getValue());
+        LOGGER.info("Reading saved, readingId={}, meterId={}, value={}",
+                saved.getId(), meter.getId(), saved.getValue());
 
         return readingMapper.toResponse(saved);
     }
 
-    public List<ElectricMeterUsageResponse> getUsage(Long apartmentId, String requesterEmail) {
+    public List<ElectricMeterUsageResponse> getUsage(final Long apartmentId, final String requesterEmail) {
 
-        ElectricMeterEntity meter = resolveOwnedMeter(apartmentId, requesterEmail);
+        final ElectricMeterEntity meter = resolveOwnedMeter(apartmentId, requesterEmail);
 
-        List<ElectricMeterReadingEntity> readings =
+        final List<ElectricMeterReadingEntity> readings =
                 readingRepository.findByMeterIdOrderByReadingDateAsc(meter.getId());
 
-        List<ElectricMeterUsageResponse> usage = new ArrayList<>();
+        final List<ElectricMeterUsageResponse> usage = new ArrayList<>();
 
         for (int i = 1; i < readings.size(); i++) {
-            ElectricMeterReadingEntity older = readings.get(i - 1);
-            ElectricMeterReadingEntity newer = readings.get(i);
+            final ElectricMeterReadingEntity older = readings.get(i - 1);
+            final ElectricMeterReadingEntity newer = readings.get(i);
             usage.add(readingMapper.toUsageResponse(older, newer));
         }
 
-        log.info("Computed {} usage period(s) for meterId={}", usage.size(), meter.getId());
+        LOGGER.info("Computed {} usage period(s) for meterId={}", usage.size(), meter.getId());
 
         return usage;
     }
 
-    private ElectricMeterEntity resolveOwnedMeter(Long apartmentId, String requesterEmail) {
+    private ElectricMeterEntity resolveOwnedMeter(final Long apartmentId, final String requesterEmail) {
 
-        ApartmentEntity apartment = apartmentRepository.findById(apartmentId)
+        final ApartmentEntity apartment = apartmentRepository.findById(apartmentId)
                 .orElseThrow(() -> new ApartmentNotFoundException(apartmentId));
 
         if (!apartment.getUser().getEmail().equals(requesterEmail)) {
-            log.warn("User={} attempted to access apartmentId={} they do not own", requesterEmail, apartmentId);
+            LOGGER.warn("User={} attempted to access apartmentId={} they do not own", requesterEmail, apartmentId);
             throw new ApartmentAccessDeniedException(apartmentId);
         }
 

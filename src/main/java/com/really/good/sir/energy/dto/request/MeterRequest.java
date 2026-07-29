@@ -8,7 +8,7 @@ public class MeterRequest {
         return meterId;
     }
 
-    public void setMeterId(Long meterId) {
+    public void setMeterId(final Long meterId) {
         this.meterId = meterId;
     }
 }

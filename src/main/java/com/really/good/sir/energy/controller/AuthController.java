@@ -23,26 +23,26 @@ public class AuthController {
 
     private final AuthService authService;
 
-    public AuthController(AuthService authService) {
+    public AuthController(final AuthService authService) {
         this.authService = authService;
     }
 
     @PostMapping("/signup")
     @ResponseStatus(HttpStatus.CREATED)
-    public SignupResponse signup(@Valid @RequestBody SignupRequest request) {
+    public SignupResponse signup(@Valid @RequestBody final SignupRequest request) {
         return authService.signup(request);
     }
 
     @PostMapping("/login")
     public LoginResponse login(
-            @Valid @RequestBody LoginRequest request,
-            HttpServletRequest httpRequest) {
+            @Valid @RequestBody final LoginRequest request,
+            final HttpServletRequest httpRequest) {
         return authService.login(request, httpRequest);
     }
 
     @PostMapping("/logout")
-    public void logout(HttpServletRequest request, HttpServletResponse response) {
-        SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
+    public void logout(final HttpServletRequest request, final HttpServletResponse response) {
+        final SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
         logoutHandler.logout(request, response, null);
     }
 }

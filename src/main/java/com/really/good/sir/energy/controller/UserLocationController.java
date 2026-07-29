@@ -15,14 +15,14 @@ public class UserLocationController {
 
     private final UserLocationService userLocationService;
 
-    public UserLocationController(UserLocationService userLocationService) {
+    public UserLocationController(final UserLocationService userLocationService) {
         this.userLocationService = userLocationService;
     }
 
     @PostMapping("/{userId}")
     public void assignLocation(
-            @PathVariable Long userId,
-            @Valid @RequestBody UserLocationRequest request
+            @PathVariable final Long userId,
+            @Valid @RequestBody final UserLocationRequest request
     ) {
         userLocationService.assignLocation(userId, request);
     }

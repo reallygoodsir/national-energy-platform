@@ -9,24 +9,24 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserLocationMapper {
 
-    public CityEntity toCity(UserLocationRequest request) {
-        CityEntity city = new CityEntity();
+    public CityEntity toCity(final UserLocationRequest request) {
+        final CityEntity city = new CityEntity();
         city.setName(request.getCity());
         return city;
     }
 
-    public StreetEntity toStreet(UserLocationRequest request, CityEntity city) {
-        StreetEntity street = new StreetEntity();
+    public StreetEntity toStreet(final UserLocationRequest request, final CityEntity city) {
+        final StreetEntity street = new StreetEntity();
         street.setName(request.getStreet());
         street.setCity(city);
         return street;
     }
 
     public ApartmentEntity toApartment(
-            UserLocationRequest request,
-            StreetEntity street
+            final UserLocationRequest request,
+            final StreetEntity street
     ) {
-        ApartmentEntity apartment = new ApartmentEntity();
+        final ApartmentEntity apartment = new ApartmentEntity();
         apartment.setStreet(street);
         apartment.setBuildingNumber(request.getBuildingNumber());
         apartment.setApartmentNumber(request.getApartmentNumber());

@@ -24,7 +24,7 @@ import java.util.List;
 @Service
 public class ElectricMeterService {
 
-    private static final Logger log = LoggerFactory.getLogger(ElectricMeterService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ElectricMeterService.class);
 
     private final ElectricMeterRepository meterRepository;
     private final ElectricMeterTypeRepository typeRepository;
@@ -32,10 +32,10 @@ public class ElectricMeterService {
     private final ApartmentRepository apartmentRepository;
 
     public ElectricMeterService(
-            ElectricMeterRepository meterRepository,
-            ElectricMeterTypeRepository typeRepository,
-            ElectricMeterMapper electricMeterMapper,
-            ApartmentRepository apartmentRepository
+            final ElectricMeterRepository meterRepository,
+            final ElectricMeterTypeRepository typeRepository,
+            final ElectricMeterMapper electricMeterMapper,
+            final ApartmentRepository apartmentRepository
     ) {
         this.meterRepository = meterRepository;
         this.typeRepository = typeRepository;
@@ -43,24 +43,24 @@ public class ElectricMeterService {
         this.apartmentRepository = apartmentRepository;
     }
 
-    public ElectricMeterResponse create(ElectricMeterRequest request) {
+    public ElectricMeterResponse create(final ElectricMeterRequest request) {
 
         if (meterRepository.existsBySerialNumber(request.getSerialNumber())) {
-            log.warn("Meter creation rejected, duplicate serialNumber={}", request.getSerialNumber());
+            LOGGER.warn("Meter creation rejected, duplicate serialNumber={}", request.getSerialNumber());
             throw new SerialNumberAlreadyExistsException(request.getSerialNumber());
         }
 
-        ElectricMeterTypeEntity type = typeRepository.findById(request.getTypeId())
+        final ElectricMeterTypeEntity type = typeRepository.findById(request.getTypeId())
                 .orElseThrow(() -> new MeterTypeNotFoundException(request.getTypeId()));
 
-        ElectricMeterEntity meter = new ElectricMeterEntity();
+        final ElectricMeterEntity meter = new ElectricMeterEntity();
         meter.setSerialNumber(request.getSerialNumber());
         meter.setPhaseCount(request.getPhaseCount());
         meter.setType(type);
 
-        ElectricMeterEntity saved = meterRepository.save(meter);
+        final ElectricMeterEntity saved = meterRepository.save(meter);
 
-        log.info("Meter created, meterId={}, serialNumber={}", saved.getId(), saved.getSerialNumber());
+        LOGGER.info("Meter created, meterId={}, serialNumber={}", saved.getId(), saved.getSerialNumber());
 
         return electricMeterMapper.toResponse(saved);
     }
@@ -72,23 +72,23 @@ public class ElectricMeterService {
                 .toList();
     }
 
-    public void assignMeter(Long apartmentId, MeterRequest request) {
+    public void assignMeter(final Long apartmentId, final MeterRequest request) {
 
-        ApartmentEntity apartment = apartmentRepository.findById(apartmentId)
+        final ApartmentEntity apartment = apartmentRepository.findById(apartmentId)
                 .orElseThrow(() -> new ApartmentNotFoundException(apartmentId));
 
-        ElectricMeterEntity meter = meterRepository.findById(request.getMeterId())
+        final  ElectricMeterEntity meter = meterRepository.findById(request.getMeterId())
                 .orElseThrow(() -> new ElectricMeterNotFoundException(request.getMeterId()));
 
         meter.setApartment(apartment);
         meterRepository.save(meter);
 
-        log.info("Meter assigned, meterId={}, apartmentId={}", meter.getId(), apartmentId);
+        LOGGER.info("Meter assigned, meterId={}, apartmentId={}", meter.getId(), apartmentId);
     }
 
-    public void removeMeter(Long apartmentId) {
+    public void removeMeter(final Long apartmentId) {
 
-        ElectricMeterEntity meter = meterRepository.findByApartmentId(apartmentId)
+        final ElectricMeterEntity meter = meterRepository.findByApartmentId(apartmentId)
                 .orElseThrow(() ->
                         new ElectricMeterNotFoundException(
                                 "No electric meter is assigned to apartment with ID " + apartmentId
@@ -97,7 +97,7 @@ public class ElectricMeterService {
         meter.setApartment(null);
         meterRepository.save(meter);
 
-        log.info("Meter unassigned from apartmentId={}, meterId={}", apartmentId, meter.getId());
+        LOGGER.info("Meter unassigned from apartmentId={}, meterId={}", apartmentId, meter.getId());
     }
 
     public List<ElectricMeterResponse> getAvailableMeters() {
@@ -107,8 +107,8 @@ public class ElectricMeterService {
                 .toList();
     }
 
-    public ElectricMeterResponse getAssignedMeter(Long apartmentId) {
-        ElectricMeterEntity meter = meterRepository.findByApartmentId(apartmentId)
+    public ElectricMeterResponse getAssignedMeter(final Long apartmentId) {
+        final ElectricMeterEntity meter = meterRepository.findByApartmentId(apartmentId)
                 .orElseThrow(() -> new ElectricMeterNotFoundException(apartmentId));
 
         return electricMeterMapper.toResponse(meter);

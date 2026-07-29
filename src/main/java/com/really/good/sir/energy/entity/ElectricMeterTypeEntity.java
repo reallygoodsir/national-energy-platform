@@ -18,9 +18,6 @@ public class ElectricMeterTypeEntity {
     @Column(nullable = false, unique = true)
     private String name;
 
-    public ElectricMeterTypeEntity() {
-    }
-
     public Long getId() {
         return id;
     }
@@ -29,7 +26,7 @@ public class ElectricMeterTypeEntity {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 }

@@ -11,25 +11,25 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ValidationErrorResponse> handleValidation(
-            MethodArgumentNotValidException ex) {
+            final MethodArgumentNotValidException ex) {
 
-        Map<String, String> errors = new HashMap<>();
+        final Map<String, String> errors = new ConcurrentHashMap<>();
 
         ex.getBindingResult().getFieldErrors()
                 .forEach(err ->
                         errors.put(err.getField(), err.getDefaultMessage()));
 
-        log.warn("Validation failed: {}", errors);
+        LOGGER.warn("MethodArgumentNotValidException: {}, {}", errors, ex.getMessage());
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
@@ -42,9 +42,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(EmailAlreadyExistsException.class)
     public ResponseEntity<ErrorResponse> handleEmail(
-            EmailAlreadyExistsException ex) {
+            final EmailAlreadyExistsException ex) {
 
-        log.warn("EmailAlreadyExistsException: {}", ex.getMessage());
+        LOGGER.warn("EmailAlreadyExistsException: {}", ex.getMessage());
 
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
@@ -57,9 +57,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidCredentialsException.class)
     public ResponseEntity<ErrorResponse> handleAuth(
-            InvalidCredentialsException ex) {
+            final InvalidCredentialsException ex) {
 
-        log.warn("InvalidCredentialsException: {}", ex.getMessage());
+        LOGGER.warn("InvalidCredentialsException: {}", ex.getMessage());
 
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
@@ -72,9 +72,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(PhoneNumberAlreadyExistsException.class)
     public ResponseEntity<ErrorResponse> handlePhone(
-            PhoneNumberAlreadyExistsException ex) {
+            final PhoneNumberAlreadyExistsException ex) {
 
-        log.warn("PhoneNumberAlreadyExistsException: {}", ex.getMessage());
+        LOGGER.warn("PhoneNumberAlreadyExistsException: {}", ex.getMessage());
 
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
@@ -87,9 +87,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleUserNotFound(
-            UserNotFoundException ex) {
+            final UserNotFoundException ex) {
 
-        log.warn("UserNotFoundException: {}", ex.getMessage());
+        LOGGER.warn("UserNotFoundException: {}", ex.getMessage());
 
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
@@ -102,9 +102,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RoleAlreadyAssignedException.class)
     public ResponseEntity<ErrorResponse> handleRoleAlreadyAssigned(
-            RoleAlreadyAssignedException ex) {
+            final RoleAlreadyAssignedException ex) {
 
-        log.warn("RoleAlreadyAssignedException: {}", ex.getMessage());
+        LOGGER.warn("RoleAlreadyAssignedException: {}", ex.getMessage());
 
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
@@ -117,9 +117,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MeterTypeNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleMeterTypeNotFound(
-            MeterTypeNotFoundException ex) {
+            final MeterTypeNotFoundException ex) {
 
-        log.warn("MeterTypeNotFoundException: {}", ex.getMessage());
+        LOGGER.warn("MeterTypeNotFoundException: {}", ex.getMessage());
 
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
@@ -131,9 +131,9 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGeneric(Exception ex) {
+    public ResponseEntity<ErrorResponse> handleGeneric(final Exception ex) {
 
-        log.error("Unhandled exception", ex);
+        LOGGER.error("Unhandled exception", ex);
 
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -146,9 +146,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(SerialNumberAlreadyExistsException.class)
     public ResponseEntity<ErrorResponse> handleSerialNumberExists(
-            SerialNumberAlreadyExistsException ex) {
+            final SerialNumberAlreadyExistsException ex) {
 
-        log.warn("SerialNumberAlreadyExistsException: {}", ex.getMessage());
+        LOGGER.warn("SerialNumberAlreadyExistsException: {}", ex.getMessage());
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
@@ -161,9 +161,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ElectricMeterNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleElectricMeterNotFound(
-            ElectricMeterNotFoundException ex) {
+            final ElectricMeterNotFoundException ex) {
 
-        log.warn("ElectricMeterNotFoundException: {}", ex.getMessage());
+        LOGGER.warn("ElectricMeterNotFoundException: {}", ex.getMessage());
 
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
@@ -176,9 +176,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ApartmentNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleApartmentNotFound(
-            ApartmentNotFoundException ex) {
+            final ApartmentNotFoundException ex) {
 
-        log.warn("ApartmentNotFoundException: {}", ex.getMessage());
+        LOGGER.warn("ApartmentNotFoundException: {}", ex.getMessage());
 
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
@@ -191,9 +191,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ApartmentAccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleApartmentAccessDenied(
-            ApartmentAccessDeniedException ex) {
+            final ApartmentAccessDeniedException ex) {
 
-        log.warn("ApartmentAccessDeniedException: {}", ex.getMessage());
+        LOGGER.warn("ApartmentAccessDeniedException: {}", ex.getMessage());
 
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
@@ -206,9 +206,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidReadingValueException.class)
     public ResponseEntity<ErrorResponse> handleInvalidMeterReading(
-            InvalidReadingValueException ex) {
+            final InvalidReadingValueException ex) {
 
-        log.warn("InvalidReadingValueException: {}", ex.getMessage());
+        LOGGER.warn("InvalidReadingValueException: {}", ex.getMessage());
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
@@ -221,9 +221,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MeterReadingNotDetectedException.class)
     public ResponseEntity<ErrorResponse> handleReadingNotDetected(
-            MeterReadingNotDetectedException ex) {
+            final MeterReadingNotDetectedException ex) {
 
-        log.warn("MeterReadingNotDetectedException: {}", ex.getMessage());
+        LOGGER.warn("MeterReadingNotDetectedException: {}", ex.getMessage());
 
         return ResponseEntity
                 .status(HttpStatus.UNPROCESSABLE_ENTITY)

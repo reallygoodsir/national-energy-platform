@@ -12,9 +12,9 @@ public class UserResponse {
     }
 
     public UserResponse(
-            Long id,
-            String email,
-            List<String> roles) {
+            final Long id,
+            final String email,
+            final List<String> roles) {
         this.id = id;
         this.email = email;
         this.roles = roles;

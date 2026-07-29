@@ -7,7 +7,7 @@ public class VisionImageRequest {
     private final VisionImage image;
     private final List<VisionFeature> features;
 
-    public VisionImageRequest(VisionImage image, List<VisionFeature> features) {
+    public VisionImageRequest(final VisionImage image, final List<VisionFeature> features) {
         this.image = image;
         this.features = features;
     }

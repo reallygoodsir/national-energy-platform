@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ElectricMeterReadingMapper {
 
-    public ElectricMeterReadingResponse toResponse(ElectricMeterReadingEntity reading) {
+    public ElectricMeterReadingResponse toResponse(final ElectricMeterReadingEntity reading) {
         return new ElectricMeterReadingResponse(
                 reading.getId(),
                 reading.getValue(),
@@ -17,8 +17,8 @@ public class ElectricMeterReadingMapper {
     }
 
     public ElectricMeterUsageResponse toUsageResponse(
-            ElectricMeterReadingEntity older,
-            ElectricMeterReadingEntity newer) {
+            final ElectricMeterReadingEntity older,
+            final ElectricMeterReadingEntity newer) {
 
         return new ElectricMeterUsageResponse(
                 older.getReadingDate(),

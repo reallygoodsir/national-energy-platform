@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ApartmentMapper {
 
-    public ApartmentResponse toResponse(ApartmentEntity apartment) {
+    public ApartmentResponse toResponse(final ApartmentEntity apartment) {
         return new ApartmentResponse(
                 apartment.getId(),
                 apartment.getStreet().getName(),

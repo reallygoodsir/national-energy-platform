@@ -4,11 +4,11 @@ import java.time.LocalDateTime;
 
 public class ElectricMeterReadingResponse {
 
-    private Long id;
-    private Double value;
-    private LocalDateTime readingDate;
+    private final Long id;
+    private final Double value;
+    private final LocalDateTime readingDate;
 
-    public ElectricMeterReadingResponse(Long id, Double value, LocalDateTime readingDate) {
+    public ElectricMeterReadingResponse(final Long id, final Double value, final LocalDateTime readingDate) {
         this.id = id;
         this.value = value;
         this.readingDate = readingDate;

@@ -22,12 +22,12 @@ public class ElectricMeterController {
 
     private final ElectricMeterService electricMeterService;
 
-    public ElectricMeterController(ElectricMeterService electricMeterService) {
+    public ElectricMeterController(final ElectricMeterService electricMeterService) {
         this.electricMeterService = electricMeterService;
     }
 
     @PostMapping
-    public ElectricMeterResponse create(@Valid @RequestBody ElectricMeterRequest request) {
+    public ElectricMeterResponse create(@Valid @RequestBody final ElectricMeterRequest request) {
         return electricMeterService.create(request);
     }
 
@@ -38,14 +38,14 @@ public class ElectricMeterController {
 
     @PostMapping("/apartments/{apartmentId}")
     public void assignMeter(
-            @PathVariable Long apartmentId,
-            @RequestBody MeterRequest request
+            @PathVariable final Long apartmentId,
+            @RequestBody final MeterRequest request
     ) {
         electricMeterService.assignMeter(apartmentId, request);
     }
 
     @DeleteMapping("/apartments/{apartmentId}")
-    public void removeMeter(@PathVariable Long apartmentId) {
+    public void removeMeter(@PathVariable final Long apartmentId) {
         electricMeterService.removeMeter(apartmentId);
     }
 
@@ -55,7 +55,7 @@ public class ElectricMeterController {
     }
 
     @GetMapping("/apartment/{apartmentId}")
-    public ElectricMeterResponse getAssignedMeter(@PathVariable Long apartmentId) {
+    public ElectricMeterResponse getAssignedMeter(@PathVariable final Long apartmentId) {
         return electricMeterService.getAssignedMeter(apartmentId);
     }
 }

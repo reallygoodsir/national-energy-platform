@@ -14,9 +14,9 @@ import java.util.List;
 @Service
 public class UserMapper {
 
-    public UserEntity toEntity(SignupRequest request) {
+    public UserEntity toEntity(final SignupRequest request) {
 
-        UserEntity user = new UserEntity();
+        final UserEntity user = new UserEntity();
         user.setFullName(request.getFullName());
         user.setEmail(request.getEmail());
         user.setPhoneNumber(request.getPhoneNumber());
@@ -27,9 +27,9 @@ public class UserMapper {
     }
 
     public SearchUserResponse toSearchUserResponse(
-            UserEntity user,
-            List<RoleResponse> assignedRoles,
-            List<RoleResponse> availableRoles) {
+            final UserEntity user,
+            final List<RoleResponse> assignedRoles,
+            final List<RoleResponse> availableRoles) {
 
         return new SearchUserResponse(
                 user.getId(),
@@ -39,8 +39,8 @@ public class UserMapper {
         );
     }
 
-    public UserResponse toUserResponse(UserEntity user) {
-        List<String> roles = user.getRoles()
+    public UserResponse toUserResponse(final UserEntity user) {
+        final List<String> roles = user.getRoles()
                 .stream()
                 .map(RoleEntity::getName)
                 .toList();

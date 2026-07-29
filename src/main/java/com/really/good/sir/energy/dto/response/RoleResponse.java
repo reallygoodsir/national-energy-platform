@@ -9,7 +9,7 @@ public class RoleResponse {
     public RoleResponse() {
     }
 
-    public RoleResponse(Long id, String name, String description) {
+    public RoleResponse(final Long id, final String name, final String description) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -27,15 +27,15 @@ public class RoleResponse {
         return description;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
-    public void setDescription(String description) {
+    public void setDescription(final String description) {
         this.description = description;
     }
 }

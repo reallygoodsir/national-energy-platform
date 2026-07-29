@@ -59,8 +59,9 @@ public class UserEntity {
     public UserEntity() {
     }
 
-    public UserEntity(Long id, String fullName, String email, String phoneNumber, String password,
-                      LocalDateTime createdAt, Set<ApartmentEntity> apartments, Set<RoleEntity> roles) {
+    public UserEntity(final Long id, final String fullName, final String email,
+                      final String phoneNumber, final String password, final LocalDateTime createdAt,
+                      final Set<ApartmentEntity> apartments, final Set<RoleEntity> roles) {
         this.id = id;
         this.fullName = fullName;
         this.email = email;
@@ -99,31 +100,31 @@ public class UserEntity {
         return roles;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
-    public void setFullName(String fullName) {
+    public void setFullName(final String fullName) {
         this.fullName = fullName;
     }
 
-    public void setEmail(String email) {
+    public void setEmail(final String email) {
         this.email = email;
     }
 
-    public void setPhoneNumber(String phoneNumber) {
+    public void setPhoneNumber(final String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 
-    public void setPassword(String password) {
+    public void setPassword(final String password) {
         this.password = password;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(final LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
-    public void setRoles(Set<RoleEntity> roles) {
+    public void setRoles(final Set<RoleEntity> roles) {
         this.roles = roles;
     }
 
@@ -131,7 +132,7 @@ public class UserEntity {
         return apartments;
     }
 
-    public void setApartments(Set<ApartmentEntity> apartments) {
+    public void setApartments(final Set<ApartmentEntity> apartments) {
         this.apartments = apartments;
     }
 }

@@ -2,10 +2,10 @@ package com.really.good.sir.energy.dto.response;
 
 public class ElectricMeterTypeResponse {
 
-    private Long id;
-    private String name;
+    private final Long id;
+    private final String name;
 
-    public ElectricMeterTypeResponse(Long id, String name) {
+    public ElectricMeterTypeResponse(final Long id, final String name) {
         this.id = id;
         this.name = name;
     }

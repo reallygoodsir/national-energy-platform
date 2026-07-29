@@ -11,7 +11,7 @@ public class ErrorResponse {
     public ErrorResponse() {
     }
 
-    public ErrorResponse(LocalDateTime timestamp, int status, String message) {
+    public ErrorResponse(final LocalDateTime timestamp, final int status, final String message) {
         this.timestamp = timestamp;
         this.status = status;
         this.message = message;

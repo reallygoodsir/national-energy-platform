@@ -6,12 +6,12 @@ public final class VisionImage {
 
     private final String content;
 
-    private VisionImage(String content) {
+    private VisionImage(final String content) {
         this.content = content;
     }
 
-    public static VisionImage fromBytes(byte[] imageBytes) {
-        String base64Content = Base64.getEncoder().encodeToString(imageBytes);
+    public static VisionImage fromBytes(final byte[] imageBytes) {
+        final String base64Content = Base64.getEncoder().encodeToString(imageBytes);
         return new VisionImage(base64Content);
     }
 

@@ -1,5 +1,6 @@
 package com.really.good.sir.energy.service;
 
+import com.really.good.sir.energy.constants.AppConstants;
 import com.really.good.sir.energy.dto.request.RoleRequest;
 import com.really.good.sir.energy.dto.response.ApartmentResponse;
 import com.really.good.sir.energy.dto.response.RoleResponse;
@@ -28,7 +29,8 @@ import java.util.stream.Collectors;
 @Service
 public class UserService {
 
-    private static final Logger log = LoggerFactory.getLogger(UserService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
+
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -38,11 +40,12 @@ public class UserService {
     private final ApartmentRepository apartmentRepository;
 
     public UserService(
-            UserRepository userRepository,
-            RoleRepository roleRepository,
-            UserMapper userMapper,
-            RoleMapper roleMapper, ApartmentMapper apartmentMapper,
-            ApartmentRepository apartmentRepository
+            final UserRepository userRepository,
+            final RoleRepository roleRepository,
+            final UserMapper userMapper,
+            final RoleMapper roleMapper,
+            final ApartmentMapper apartmentMapper,
+            final ApartmentRepository apartmentRepository
     ) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
@@ -52,23 +55,23 @@ public class UserService {
         this.apartmentRepository = apartmentRepository;
     }
 
-    public SearchUserResponse search(String searchValue) {
+    public SearchUserResponse search(final String searchValue) {
 
-        log.info("Searching user by value={}", searchValue);
+        LOGGER.info("Searching user by value={}", searchValue);
 
-        UserEntity user = userRepository.findByEmail(searchValue)
+        final UserEntity user = userRepository.findByEmail(searchValue)
                 .or(() -> userRepository.findByPhoneNumber(searchValue))
                 .orElseThrow(() -> {
-                    log.warn("User search found no match for value={}", searchValue);
-                    return new UserNotFoundException("User not found");
+                    LOGGER.warn("User search found no match for value={}", searchValue);
+                    return new UserNotFoundException(AppConstants.USER_NOT_FOUND);
                 });
 
-        List<RoleResponse> assignedRoles = user.getRoles()
+        final List<RoleResponse> assignedRoles = user.getRoles()
                 .stream()
                 .map(roleMapper::toRoleResponse)
                 .collect(Collectors.toList());
 
-        List<RoleResponse> availableRoles = roleRepository.findAll()
+        final List<RoleResponse> availableRoles = roleRepository.findAll()
                 .stream()
                 .filter(role -> !user.getRoles().contains(role))
                 .map(roleMapper::toRoleResponse)
@@ -81,35 +84,35 @@ public class UserService {
         );
     }
 
-    public void assignRole(RoleRequest request) {
+    public void assignRole(final RoleRequest request) {
 
-        UserEntity user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+        final UserEntity user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new UserNotFoundException(AppConstants.USER_NOT_FOUND));
 
-        RoleEntity role = roleRepository.findById(request.getRoleId())
+        final RoleEntity role = roleRepository.findById(request.getRoleId())
                 .orElseThrow(() -> new RuntimeException("Role not found"));
 
         if (user.getRoles().contains(role)) {
-            log.warn("Role already assigned, userId={}, roleId={}", request.getUserId(), request.getRoleId());
+            LOGGER.warn("Role already assigned, userId={}, roleId={}", request.getUserId(), request.getRoleId());
             throw new RoleAlreadyAssignedException("Role already assigned");
         }
 
         user.getRoles().add(role);
         userRepository.save(user);
 
-        log.info("Role assigned, userId={}, roleId={}", request.getUserId(), request.getRoleId());
+        LOGGER.info("Role assigned, userId={}, roleId={}", request.getUserId(), request.getRoleId());
     }
 
-    public void removeRole(RoleRequest request) {
+    public void removeRole(final RoleRequest request) {
 
-        UserEntity user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+        final UserEntity user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new UserNotFoundException(AppConstants.USER_NOT_FOUND));
 
-        RoleEntity role = roleRepository.findById(request.getRoleId())
+        final RoleEntity role = roleRepository.findById(request.getRoleId())
                 .orElseThrow(() -> new RoleNotFoundException("Role not found"));
 
         if (!user.getRoles().contains(role)) {
-            log.warn("Role not assigned, cannot remove, userId={}, roleId={}",
+            LOGGER.warn("Role not assigned, cannot remove, userId={}, roleId={}",
                     request.getUserId(), request.getRoleId());
             throw new RoleNotAssignedException("Role is not assigned to user");
         }
@@ -117,42 +120,42 @@ public class UserService {
         user.getRoles().remove(role);
         userRepository.save(user);
 
-        log.info("Role removed, userId={}, roleId={}", request.getUserId(), request.getRoleId());
+        LOGGER.info("Role removed, userId={}, roleId={}", request.getUserId(), request.getRoleId());
     }
 
-    public UserEntity findByEmail(String email) {
+    public UserEntity findByEmail(final String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException(AppConstants.USER_NOT_FOUND));
     }
 
-    public List<ApartmentResponse> getUserApartments(Long userId) {
+    public List<ApartmentResponse> getUserApartments(final Long userId) {
 
-        UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+        final UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(AppConstants.USER_NOT_FOUND));
 
-        List<ApartmentEntity> apartments =
+        final List<ApartmentEntity> apartments =
                 apartmentRepository.findAllByUserId(user.getId());
 
-        log.info("Loaded {} apartment(s) for userId={}", apartments.size(), userId);
+        LOGGER.info("Loaded {} apartment(s) for userId={}", apartments.size(), userId);
 
         return apartments.stream()
                 .map(apartmentMapper::toResponse)
                 .toList();
     }
 
-    public UserResponse getCurrentUser(String email) {
-        UserEntity user = findByEmail(email);
+    public UserResponse getCurrentUser(final String email) {
+        final UserEntity user = findByEmail(email);
         return userMapper.toUserResponse(user);
     }
 
-    public List<ApartmentResponse> getCurrentUserApartmentsWithMeter(String email) {
+    public List<ApartmentResponse> getCurrentUserApartmentsWithMeter(final String email) {
 
-        UserEntity user = findByEmail(email);
+        final UserEntity user = findByEmail(email);
 
-        List<ApartmentEntity> apartments =
+        final List<ApartmentEntity> apartments =
                 apartmentRepository.findAllByUserIdWithMeterAssigned(user.getId());
 
-        log.info("Loaded {} metered apartment(s) for email={}", apartments.size(), email);
+        LOGGER.info("Loaded {} metered apartment(s) for email={}", apartments.size(), email);
 
         return apartments.stream()
                 .map(apartmentMapper::toResponse)

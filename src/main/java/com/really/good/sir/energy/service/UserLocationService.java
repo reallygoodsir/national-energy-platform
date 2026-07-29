@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class UserLocationService {
 
-    private static final Logger log = LoggerFactory.getLogger(UserLocationService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserLocationService.class);
 
     private final UserRepository userRepository;
     private final CityRepository cityRepository;
@@ -28,11 +28,11 @@ public class UserLocationService {
     private final UserLocationMapper mapper;
 
     public UserLocationService(
-            UserRepository userRepository,
-            CityRepository cityRepository,
-            StreetRepository streetRepository,
-            ApartmentRepository apartmentRepository,
-            UserLocationMapper mapper
+            final UserRepository userRepository,
+            final CityRepository cityRepository,
+            final StreetRepository streetRepository,
+            final ApartmentRepository apartmentRepository,
+            final UserLocationMapper mapper
     ) {
         this.userRepository = userRepository;
         this.cityRepository = cityRepository;
@@ -42,19 +42,19 @@ public class UserLocationService {
     }
 
     @Transactional
-    public void assignLocation(Long userId, UserLocationRequest request) {
+    public void assignLocation(final Long userId, final UserLocationRequest request) {
 
-        UserEntity user = userRepository.findById(userId)
+        final UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(String.valueOf(userId)));
 
-        CityEntity city = cityRepository.findByName(request.getCity())
+        final CityEntity city = cityRepository.findByName(request.getCity())
                 .orElseGet(() -> cityRepository.save(mapper.toCity(request)));
 
-        StreetEntity street = streetRepository
+        final StreetEntity street = streetRepository
                 .findByCityIdAndName(city.getId(), request.getStreet())
                 .orElseGet(() -> streetRepository.save(mapper.toStreet(request, city)));
 
-        ApartmentEntity apartment = apartmentRepository
+        final ApartmentEntity apartment = apartmentRepository
                 .findByStreetIdAndBuildingNumberAndApartmentNumber(
                         street.getId(),
                         request.getBuildingNumber(),
@@ -66,7 +66,7 @@ public class UserLocationService {
 
         apartmentRepository.save(apartment);
 
-        log.info("Location assigned, userId={}, city={}, street={}, building={}, apartment={}",
+        LOGGER.info("Location assigned, userId={}, city={}, street={}, building={}, apartment={}",
                 userId, request.getCity(), request.getStreet(),
                 request.getBuildingNumber(), request.getApartmentNumber());
     }

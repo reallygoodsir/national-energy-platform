@@ -10,9 +10,6 @@ public class RoleRequest {
     @NotNull(message = "Role id is required")
     private Long roleId;
 
-    public RoleRequest() {
-    }
-
     public Long getUserId() {
         return userId;
     }
@@ -21,11 +18,11 @@ public class RoleRequest {
         return roleId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(final Long userId) {
         this.userId = userId;
     }
 
-    public void setRoleId(Long roleId) {
+    public void setRoleId(final Long roleId) {
         this.roleId = roleId;
     }
 }

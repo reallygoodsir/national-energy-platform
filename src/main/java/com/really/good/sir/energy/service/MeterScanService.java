@@ -8,6 +8,8 @@ import com.really.good.sir.energy.exception.MeterReadingNotDetectedException;
 import com.really.good.sir.energy.integration.google.client.VisionOcrClient;
 import com.really.good.sir.energy.integration.google.dto.response.DetectedTextBlock;
 import com.really.good.sir.energy.repository.ApartmentRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,35 +22,36 @@ import java.util.regex.Pattern;
 public class MeterScanService {
 
     private static final Pattern DIGIT_PATTERN = Pattern.compile("^\\d+(\\.\\d+)?$");
+    private static final Logger LOGGER = LoggerFactory.getLogger(MeterScanService.class);
 
     private final VisionOcrClient visionOcrClient;
     private final ApartmentRepository apartmentRepository;
 
-    public MeterScanService(VisionOcrClient visionOcrClient, ApartmentRepository apartmentRepository) {
+    public MeterScanService(final VisionOcrClient visionOcrClient, final ApartmentRepository apartmentRepository) {
         this.visionOcrClient = visionOcrClient;
         this.apartmentRepository = apartmentRepository;
     }
 
-    public MeterScanResponse scan(Long apartmentId, MultipartFile file, String requesterEmail) {
+    public MeterScanResponse scan(final Long apartmentId, final MultipartFile file, final String requesterEmail) {
 
         verifyOwnership(apartmentId, requesterEmail);
 
-        byte[] imageBytes;
+        final byte[] imageBytes;
         try {
             imageBytes = file.getBytes();
         } catch (IOException e) {
-            throw new MeterReadingNotDetectedException();
+            throw new MeterReadingNotDetectedException(e);
         }
 
-        List<DetectedTextBlock> blocks = visionOcrClient.detectText(imageBytes);
+        final List<DetectedTextBlock> blocks = visionOcrClient.detectText(imageBytes);
 
-        List<DetectedTextBlock> candidates = blocks.stream()
+        final List<DetectedTextBlock> candidates = blocks.stream()
                 .filter(block -> DIGIT_PATTERN.matcher(block.getText()).matches())
                 .toList();
 
-        System.out.println("[MeterScanService] Candidate blocks after digit filter: " + candidates);
+        LOGGER.info("Candidate blocks after digit filter: {}", candidates);
 
-        String bestCandidate = candidates.stream()
+        final String bestCandidate = candidates.stream()
                 .max(Comparator
                         .comparingInt((DetectedTextBlock b) -> b.getText().replace(".", "").length())
                         .thenComparingDouble(DetectedTextBlock::getBoundingBoxArea))
@@ -58,9 +61,9 @@ public class MeterScanService {
         return new MeterScanResponse(bestCandidate);
     }
 
-    private void verifyOwnership(Long apartmentId, String requesterEmail) {
+    private void verifyOwnership(final Long apartmentId, final String requesterEmail) {
 
-        ApartmentEntity apartment = apartmentRepository.findById(apartmentId)
+        final ApartmentEntity apartment = apartmentRepository.findById(apartmentId)
                 .orElseThrow(() -> new ApartmentNotFoundException(apartmentId));
 
         if (!apartment.getUser().getEmail().equals(requesterEmail)) {

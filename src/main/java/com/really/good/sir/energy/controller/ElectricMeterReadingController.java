@@ -29,8 +29,8 @@ public class ElectricMeterReadingController {
     private final ElectricMeterReadingService readingService;
     private final MeterScanService meterScanService;
 
-    public ElectricMeterReadingController(ElectricMeterReadingService readingService,
-                                          MeterScanService meterScanService) {
+    public ElectricMeterReadingController(final ElectricMeterReadingService readingService,
+                                          final MeterScanService meterScanService) {
         this.readingService = readingService;
         this.meterScanService = meterScanService;
     }
@@ -38,34 +38,34 @@ public class ElectricMeterReadingController {
     @PostMapping("/{apartmentId}/readings")
     @ResponseStatus(HttpStatus.CREATED)
     public ElectricMeterReadingResponse submit(
-            @PathVariable Long apartmentId,
-            @Valid @RequestBody ElectricMeterReadingRequest request,
-            Authentication authentication) {
+            @PathVariable final Long apartmentId,
+            @Valid @RequestBody final ElectricMeterReadingRequest request,
+            final Authentication authentication) {
 
         return readingService.submitReading(apartmentId, request, authentication.getName());
     }
 
     @GetMapping("/{apartmentId}/readings")
     public List<ElectricMeterReadingResponse> getReadings(
-            @PathVariable Long apartmentId,
-            Authentication authentication) {
+            @PathVariable final Long apartmentId,
+            final Authentication authentication) {
 
         return readingService.getReadings(apartmentId, authentication.getName());
     }
 
     @GetMapping("/{apartmentId}/readings/usage")
     public List<ElectricMeterUsageResponse> getUsage(
-            @PathVariable Long apartmentId,
-            Authentication authentication) {
+            @PathVariable final Long apartmentId,
+            final Authentication authentication) {
 
         return readingService.getUsage(apartmentId, authentication.getName());
     }
 
     @PostMapping(value = "/{apartmentId}/readings/scan", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public MeterScanResponse scan(
-            @PathVariable Long apartmentId,
-            @RequestParam("file") MultipartFile file,
-            Authentication authentication) {
+            @PathVariable final Long apartmentId,
+            @RequestParam("file") final MultipartFile file,
+            final Authentication authentication) {
 
         return meterScanService.scan(apartmentId, file, authentication.getName());
     }

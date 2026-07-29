@@ -13,10 +13,10 @@ public class SearchUserResponse {
     }
 
     public SearchUserResponse(
-            Long userId,
-            String fullName,
-            List<RoleResponse> assignedRoles,
-            List<RoleResponse> availableRoles) {
+            final Long userId,
+            final String fullName,
+            final List<RoleResponse> assignedRoles,
+            final List<RoleResponse> availableRoles) {
 
         this.userId = userId;
         this.fullName = fullName;
@@ -40,19 +40,19 @@ public class SearchUserResponse {
         return availableRoles;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(final Long userId) {
         this.userId = userId;
     }
 
-    public void setFullName(String fullName) {
+    public void setFullName(final String fullName) {
         this.fullName = fullName;
     }
 
-    public void setAssignedRoles(List<RoleResponse> assignedRoles) {
+    public void setAssignedRoles(final List<RoleResponse> assignedRoles) {
         this.assignedRoles = assignedRoles;
     }
 
-    public void setAvailableRoles(List<RoleResponse> availableRoles) {
+    public void setAvailableRoles(final List<RoleResponse> availableRoles) {
         this.availableRoles = availableRoles;
     }
 }

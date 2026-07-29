@@ -41,10 +41,10 @@ public class StreetEntity {
     }
 
     public StreetEntity(
-            Long id,
-            String name,
-            CityEntity city,
-            Set<ApartmentEntity> apartments) {
+            final Long id,
+            final String name,
+            final CityEntity city,
+            final Set<ApartmentEntity> apartments) {
 
         this.id = id;
         this.name = name;
@@ -68,19 +68,19 @@ public class StreetEntity {
         return apartments;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
-    public void setCity(CityEntity city) {
+    public void setCity(final CityEntity city) {
         this.city = city;
     }
 
-    public void setApartments(Set<ApartmentEntity> apartments) {
+    public void setApartments(final Set<ApartmentEntity> apartments) {
         this.apartments = apartments;
     }
 }

@@ -2,12 +2,13 @@ package com.really.good.sir.energy.dto.response;
 
 public class ApartmentResponse {
 
-    private Long id;
-    private String street;
-    private String buildingNumber;
-    private String apartmentNumber;
+    private final Long id;
+    private final String street;
+    private final String buildingNumber;
+    private final String apartmentNumber;
 
-    public ApartmentResponse(Long id, String street, String buildingNumber, String apartmentNumber) {
+    public ApartmentResponse(final Long id, final String street,
+                             final String buildingNumber, final String apartmentNumber) {
         this.id = id;
         this.street = street;
         this.buildingNumber = buildingNumber;

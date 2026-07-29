@@ -2,12 +2,13 @@ package com.really.good.sir.energy.dto.response;
 
 public class ElectricMeterResponse {
 
-    private Long id;
-    private String serialNumber;
-    private Integer phaseCount;
-    private String typeName;
+    private final Long id;
+    private final String serialNumber;
+    private final Integer phaseCount;
+    private final String typeName;
 
-    public ElectricMeterResponse(Long id, String serialNumber, Integer phaseCount, String typeName) {
+    public ElectricMeterResponse(final Long id, final String serialNumber,
+                                 final Integer phaseCount, final String typeName) {
         this.id = id;
         this.serialNumber = serialNumber;
         this.phaseCount = phaseCount;

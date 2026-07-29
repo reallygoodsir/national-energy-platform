@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class AuthMapper {
-    public SignupResponse toSignupResponse(UserEntity userEntity) {
+    public SignupResponse toSignupResponse(final UserEntity userEntity) {
         return new SignupResponse(
                 userEntity.getId(),
                 userEntity.getFullName(),
@@ -15,7 +15,7 @@ public class AuthMapper {
         );
     }
 
-    public LoginResponse toLoginResponse(UserEntity userEntity) {
+    public LoginResponse toLoginResponse(final UserEntity userEntity) {
         return new LoginResponse(
                 userEntity.getId(),
                 userEntity.getFullName(),

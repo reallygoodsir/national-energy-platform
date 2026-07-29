@@ -5,7 +5,7 @@ public class DetectedTextBlock {
     private final String text;
     private final double boundingBoxArea;
 
-    public DetectedTextBlock(String text, double boundingBoxArea) {
+    public DetectedTextBlock(final String text, final double boundingBoxArea) {
         this.text = text;
         this.boundingBoxArea = boundingBoxArea;
     }

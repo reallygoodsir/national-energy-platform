@@ -47,8 +47,8 @@ public class ApartmentEntity {
     public ApartmentEntity() {
     }
 
-    public ApartmentEntity(Long id, String buildingNumber, String apartmentNumber,
-                           StreetEntity street, UserEntity user) {
+    public ApartmentEntity(final Long id, final String buildingNumber, final String apartmentNumber,
+                           final StreetEntity street, final UserEntity user) {
         this.id = id;
         this.buildingNumber = buildingNumber;
         this.apartmentNumber = apartmentNumber;
@@ -72,19 +72,19 @@ public class ApartmentEntity {
         return street;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
-    public void setBuildingNumber(String buildingNumber) {
+    public void setBuildingNumber(final String buildingNumber) {
         this.buildingNumber = buildingNumber;
     }
 
-    public void setApartmentNumber(String apartmentNumber) {
+    public void setApartmentNumber(final String apartmentNumber) {
         this.apartmentNumber = apartmentNumber;
     }
 
-    public void setStreet(StreetEntity street) {
+    public void setStreet(final StreetEntity street) {
         this.street = street;
     }
 
@@ -92,7 +92,7 @@ public class ApartmentEntity {
         return user;
     }
 
-    public void setUser(UserEntity user) {
+    public void setUser(final UserEntity user) {
         this.user = user;
     }
 }

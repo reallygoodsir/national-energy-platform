@@ -9,7 +9,7 @@ public class LoginResponse {
     public LoginResponse() {
     }
 
-    public LoginResponse(Long id, String fullName, String email) {
+    public LoginResponse(final Long id, final String fullName, final String email) {
         this.id = id;
         this.fullName = fullName;
         this.email = email;

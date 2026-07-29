@@ -4,11 +4,12 @@ import java.time.LocalDateTime;
 
 public class ElectricMeterUsageResponse {
 
-    private LocalDateTime periodStart;
-    private LocalDateTime periodEnd;
-    private Double consumption;
+    private final LocalDateTime periodStart;
+    private final LocalDateTime periodEnd;
+    private final Double consumption;
 
-    public ElectricMeterUsageResponse(LocalDateTime periodStart, LocalDateTime periodEnd, Double consumption) {
+    public ElectricMeterUsageResponse(final LocalDateTime periodStart,
+                                      final LocalDateTime periodEnd, final Double consumption) {
         this.periodStart = periodStart;
         this.periodEnd = periodEnd;
         this.consumption = consumption;

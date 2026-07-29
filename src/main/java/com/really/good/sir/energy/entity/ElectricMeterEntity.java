@@ -33,9 +33,6 @@ public class ElectricMeterEntity {
     @JoinColumn(name = "apartment_id", unique = true)
     private ApartmentEntity apartment;
 
-    public ElectricMeterEntity() {
-    }
-
     public Long getId() {
         return id;
     }
@@ -44,7 +41,7 @@ public class ElectricMeterEntity {
         return serialNumber;
     }
 
-    public void setSerialNumber(String serialNumber) {
+    public void setSerialNumber(final String serialNumber) {
         this.serialNumber = serialNumber;
     }
 
@@ -52,7 +49,7 @@ public class ElectricMeterEntity {
         return phaseCount;
     }
 
-    public void setPhaseCount(Integer phaseCount) {
+    public void setPhaseCount(final Integer phaseCount) {
         this.phaseCount = phaseCount;
     }
 
@@ -60,7 +57,7 @@ public class ElectricMeterEntity {
         return type;
     }
 
-    public void setType(ElectricMeterTypeEntity type) {
+    public void setType(final ElectricMeterTypeEntity type) {
         this.type = type;
     }
 
@@ -68,7 +65,7 @@ public class ElectricMeterEntity {
         return apartment;
     }
 
-    public void setApartment(ApartmentEntity apartment) {
+    public void setApartment(final ApartmentEntity apartment) {
         this.apartment = apartment;
     }
 }

@@ -12,51 +12,55 @@ import java.util.List;
 @Component
 public class VisionResponseMapper {
 
-    private static final Logger log = LoggerFactory.getLogger(VisionResponseMapper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(VisionResponseMapper.class);
 
-    public List<DetectedTextBlock> parse(JsonNode response) {
+    public List<DetectedTextBlock> parse(final JsonNode response) {
 
-        List<DetectedTextBlock> blocks = new ArrayList<>();
+        final List<DetectedTextBlock> blocks = new ArrayList<>();
 
-        JsonNode annotations = response
+        final JsonNode annotations = response
                 .path("responses").path(0)
                 .path("textAnnotations");
 
         if (!annotations.isArray() || annotations.isEmpty()) {
-            log.warn("No text annotations found in Vision API response");
-            return blocks;
-        }
+            LOGGER.warn("No text annotations found in Vision API response");
+        } else {
 
-        for (int i = 1; i < annotations.size(); i++) {
-            JsonNode annotation = annotations.get(i);
-            String text = annotation.path("description").asText();
-            double area = computeBoundingBoxArea(annotation.path("boundingPoly").path("vertices"));
-            blocks.add(new DetectedTextBlock(text, area));
+            for (int i = 1; i < annotations.size(); i++) {
+                final JsonNode annotation = annotations.get(i);
+                final String text = annotation.path("description").asText();
+                final double area = computeBoundingBoxArea(annotation.path("boundingPoly").path("vertices"));
+                blocks.add(new DetectedTextBlock(text, area));
+            }
         }
 
         return blocks;
     }
 
-    private double computeBoundingBoxArea(JsonNode vertices) {
+    private double computeBoundingBoxArea(final JsonNode vertices) {
 
-        if (!vertices.isArray() || vertices.size() < 4) {
-            return 0;
+        double area = 0;
+
+        if (vertices.isArray() && vertices.size() >= 4) {
+
+            int minX = vertices.get(0).path("x").asInt();
+            int maxX = minX;
+            int minY = vertices.get(0).path("y").asInt();
+            int maxY = minY;
+
+            for (final JsonNode vertex : vertices) {
+                final int x = vertex.path("x").asInt();
+                final int y = vertex.path("y").asInt();
+
+                minX = Math.min(minX, x);
+                maxX = Math.max(maxX, x);
+                minY = Math.min(minY, y);
+                maxY = Math.max(maxY, y);
+            }
+
+            area = (double) (maxX - minX) * (maxY - minY);
         }
 
-        int minX = vertices.get(0).path("x").asInt();
-        int maxX = minX;
-        int minY = vertices.get(0).path("y").asInt();
-        int maxY = minY;
-
-        for (JsonNode vertex : vertices) {
-            int x = vertex.path("x").asInt();
-            int y = vertex.path("y").asInt();
-            minX = Math.min(minX, x);
-            maxX = Math.max(maxX, x);
-            minY = Math.min(minY, y);
-            maxY = Math.max(maxY, y);
-        }
-
-        return (double) (maxX - minX) * (maxY - minY);
+        return area;
     }
 }

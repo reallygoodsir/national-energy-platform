@@ -26,17 +26,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthService {
 
-    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthService.class);
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final AuthMapper authMapper;
     private final UserMapper userMapper;
 
-    public AuthService(UserRepository userRepository,
-                       RoleRepository roleRepository,
-                       AuthMapper authMapper,
-                       UserMapper userMapper) {
+    public AuthService(final UserRepository userRepository,
+                       final RoleRepository roleRepository,
+                       final AuthMapper authMapper,
+                       final UserMapper userMapper) {
 
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
@@ -44,65 +44,65 @@ public class AuthService {
         this.userMapper = userMapper;
     }
 
-    public SignupResponse signup(SignupRequest request) {
+    public SignupResponse signup(final SignupRequest request) {
 
-        log.info("Signup attempt for email={}", request.getEmail());
+        LOGGER.info("Signup attempt for email={}", request.getEmail());
 
         if (userRepository.existsByEmail(request.getEmail())) {
-            log.warn("Signup rejected, email already exists: {}", request.getEmail());
+            LOGGER.warn("Signup rejected, email already exists: {}", request.getEmail());
             throw new EmailAlreadyExistsException("Email already exists");
         }
 
         if (userRepository.existsByPhoneNumber(request.getPhoneNumber())) {
-            log.warn("Signup rejected, phone number already exists: {}", request.getPhoneNumber());
+            LOGGER.warn("Signup rejected, phone number already exists: {}", request.getPhoneNumber());
             throw new PhoneNumberAlreadyExistsException("Phone number already exists");
         }
 
-        UserEntity userEntity = userMapper.toEntity(request);
+        final UserEntity userEntity = userMapper.toEntity(request);
 
-        RoleEntity consumerRole = roleRepository.findByName("CONSUMER")
+        final RoleEntity consumerRole = roleRepository.findByName("CONSUMER")
                 .orElseThrow(() -> {
-                    log.error("CONSUMER role not found in database — check role seed data");
+                    LOGGER.error("CONSUMER role not found in database — check role seed data");
                     return new RuntimeException("CONSUMER role not found");
                 });
 
         userEntity.getRoles().add(consumerRole);
 
-        UserEntity savedUserEntity = userRepository.save(userEntity);
+        final UserEntity savedUserEntity = userRepository.save(userEntity);
 
-        log.info("Signup successful, new userId={}", savedUserEntity.getId());
+        LOGGER.info("Signup successful, new userId={}", savedUserEntity.getId());
 
         return authMapper.toSignupResponse(savedUserEntity);
     }
 
-    public LoginResponse login(LoginRequest request, HttpServletRequest httpRequest) {
+    public LoginResponse login(final LoginRequest request, final HttpServletRequest httpRequest) {
 
-        log.info("Login attempt for email={}", request.getEmail());
+        LOGGER.info("Login attempt for email={}", request.getEmail());
 
-        UserEntity userEntity = userRepository.findByEmail(request.getEmail())
+        final UserEntity userEntity = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> {
-                    log.warn("Login failed, no account for email={}", request.getEmail());
+                    LOGGER.warn("Login failed, no account for email={}", request.getEmail());
                     return new InvalidCredentialsException("Invalid email or password");
                 });
 
         if (!userEntity.getPassword().equals(request.getPassword())) {
-            log.warn("Login failed, incorrect password for email={}", request.getEmail());
+            LOGGER.warn("Login failed, incorrect password for email={}", request.getEmail());
             throw new InvalidCredentialsException("Invalid email or password");
         }
 
-        var authorities = userEntity.getRoles()
+        final var authorities = userEntity.getRoles()
                 .stream()
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
                 .toList();
 
-        UsernamePasswordAuthenticationToken authentication =
+        final UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken(
                         userEntity.getEmail(),
                         null,
                         authorities
                 );
 
-        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        final SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authentication);
 
         SecurityContextHolder.setContext(context);
@@ -113,7 +113,7 @@ public class AuthService {
                         context
                 );
 
-        log.info("Login successful for email={}", request.getEmail());
+        LOGGER.info("Login successful for email={}", request.getEmail());
 
         return authMapper.toLoginResponse(userEntity);
     }

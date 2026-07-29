@@ -16,9 +16,6 @@ public class UserLocationRequest {
     @NotBlank(message = "Apartment number is required")
     private String apartmentNumber;
 
-    public UserLocationRequest() {
-    }
-
     public String getCity() {
         return city;
     }
@@ -35,19 +32,19 @@ public class UserLocationRequest {
         return apartmentNumber;
     }
 
-    public void setCity(String city) {
+    public void setCity(final String city) {
         this.city = city;
     }
 
-    public void setStreet(String street) {
+    public void setStreet(final String street) {
         this.street = street;
     }
 
-    public void setBuildingNumber(String buildingNumber) {
+    public void setBuildingNumber(final String buildingNumber) {
         this.buildingNumber = buildingNumber;
     }
 
-    public void setApartmentNumber(String apartmentNumber) {
+    public void setApartmentNumber(final String apartmentNumber) {
         this.apartmentNumber = apartmentNumber;
     }
 }

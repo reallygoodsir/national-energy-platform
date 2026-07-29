@@ -4,7 +4,7 @@ public final class VisionFeature {
 
     private final String type;
 
-    private VisionFeature(String type) {
+    private VisionFeature(final String type) {
         this.type = type;
     }
 

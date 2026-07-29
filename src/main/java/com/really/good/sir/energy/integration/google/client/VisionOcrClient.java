@@ -11,6 +11,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -18,7 +19,7 @@ import java.util.List;
 @Component
 public class VisionOcrClient {
 
-    private static final Logger log = LoggerFactory.getLogger(VisionOcrClient.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(VisionOcrClient.class);
 
     private final RestTemplate restTemplate;
     private final VisionResponseMapper responseMapper;
@@ -26,10 +27,10 @@ public class VisionOcrClient {
     private final String endpoint;
 
     public VisionOcrClient(
-            RestTemplate restTemplate,
-            VisionResponseMapper responseMapper,
-            @Value("${google.vision.api-key}") String apiKey,
-            @Value("${google.vision.endpoint}") String endpoint
+            final RestTemplate restTemplate,
+            final VisionResponseMapper responseMapper,
+            @Value("${google.vision.api-key}") final String apiKey,
+            @Value("${google.vision.endpoint}") final String endpoint
     ) {
         this.restTemplate = restTemplate;
         this.responseMapper = responseMapper;
@@ -37,24 +38,24 @@ public class VisionOcrClient {
         this.endpoint = endpoint;
     }
 
-    public List<DetectedTextBlock> detectText(byte[] imageBytes) {
+    public List<DetectedTextBlock> detectText(final byte[] imageBytes) {
 
-        log.info("Sending image to Vision API, size={} bytes", imageBytes.length);
+        LOGGER.info("Sending image to Vision API, size={} bytes", imageBytes.length);
 
-        VisionAnnotateRequestBody requestBody = VisionAnnotateRequestBody.forTextDetection(imageBytes);
+        final VisionAnnotateRequestBody requestBody = VisionAnnotateRequestBody.forTextDetection(imageBytes);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+        final MultiValueMap<String, String> headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 
-        HttpEntity<VisionAnnotateRequestBody> httpEntity = new HttpEntity<>(requestBody, headers);
+        final HttpEntity<VisionAnnotateRequestBody> httpEntity = new HttpEntity<>(requestBody, headers);
 
-        String url = endpoint + "?key=" + apiKey;
+        final String url = endpoint + "?key=" + apiKey;
 
-        JsonNode response = restTemplate.postForObject(url, httpEntity, JsonNode.class);
+        final JsonNode response = restTemplate.postForObject(url, httpEntity, JsonNode.class);
 
-        List<DetectedTextBlock> blocks = responseMapper.parse(response);
+        final List<DetectedTextBlock> blocks = responseMapper.parse(response);
 
-        log.info("Vision API returned {} text block(s)", blocks.size());
+        LOGGER.info("Vision API returned {} text block(s)", blocks.size());
 
         return blocks;
     }

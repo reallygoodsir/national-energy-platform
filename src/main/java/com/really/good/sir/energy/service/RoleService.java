@@ -14,13 +14,13 @@ public class RoleService {
     private final RoleRepository roleRepository;
     private final RoleMapper roleMapper;
 
-    public RoleService(RoleRepository roleRepository, RoleMapper roleMapper) {
+    public RoleService(final RoleRepository roleRepository, final RoleMapper roleMapper) {
         this.roleRepository = roleRepository;
         this.roleMapper = roleMapper;
     }
 
     public List<RoleResponse> getAllRoles() {
-        List<RoleEntity> rolesEntities = roleRepository.findAll();
+        final List<RoleEntity> rolesEntities = roleRepository.findAll();
         return roleMapper.toRolesResponse(rolesEntities);
     }
 }

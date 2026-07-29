@@ -28,7 +28,7 @@ public class CityEntity {
     public CityEntity() {
     }
 
-    public CityEntity(Long id, String name, Set<StreetEntity> streets) {
+    public CityEntity(final Long id, final String name, final Set<StreetEntity> streets) {
         this.id = id;
         this.name = name;
         this.streets = streets;
@@ -46,15 +46,15 @@ public class CityEntity {
         return streets;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
-    public void setStreets(Set<StreetEntity> streets) {
+    public void setStreets(final Set<StreetEntity> streets) {
         this.streets = streets;
     }
 }

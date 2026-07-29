@@ -30,9 +30,6 @@ public class ElectricMeterReadingEntity {
     @Column(name = "reading_date", nullable = false)
     private LocalDateTime readingDate;
 
-    public ElectricMeterReadingEntity() {
-    }
-
     public Long getId() {
         return id;
     }
@@ -41,7 +38,7 @@ public class ElectricMeterReadingEntity {
         return meter;
     }
 
-    public void setMeter(ElectricMeterEntity meter) {
+    public void setMeter(final ElectricMeterEntity meter) {
         this.meter = meter;
     }
 
@@ -49,7 +46,7 @@ public class ElectricMeterReadingEntity {
         return value;
     }
 
-    public void setValue(Double value) {
+    public void setValue(final Double value) {
         this.value = value;
     }
 
@@ -57,7 +54,7 @@ public class ElectricMeterReadingEntity {
         return readingDate;
     }
 
-    public void setReadingDate(LocalDateTime readingDate) {
+    public void setReadingDate(final LocalDateTime readingDate) {
         this.readingDate = readingDate;
     }
 }
