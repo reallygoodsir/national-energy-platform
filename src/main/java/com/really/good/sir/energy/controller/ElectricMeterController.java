@@ -1,5 +1,6 @@
 package com.really.good.sir.energy.controller;
 
+import com.really.good.sir.energy.annotation.AdminOnly;
 import com.really.good.sir.energy.dto.request.ElectricMeterRequest;
 import com.really.good.sir.energy.dto.request.MeterRequest;
 import com.really.good.sir.energy.dto.response.ElectricMeterResponse;
@@ -27,6 +28,7 @@ public class ElectricMeterController {
     }
 
     @PostMapping
+    @AdminOnly
     public ElectricMeterResponse create(@Valid @RequestBody final ElectricMeterRequest request) {
         return electricMeterService.create(request);
     }
@@ -37,6 +39,7 @@ public class ElectricMeterController {
     }
 
     @PostMapping("/apartments/{apartmentId}")
+    @AdminOnly
     public void assignMeter(
             @PathVariable final Long apartmentId,
             @RequestBody final MeterRequest request
@@ -45,6 +48,7 @@ public class ElectricMeterController {
     }
 
     @DeleteMapping("/apartments/{apartmentId}")
+    @AdminOnly
     public void removeMeter(@PathVariable final Long apartmentId) {
         electricMeterService.removeMeter(apartmentId);
     }

@@ -20,6 +20,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
 
@@ -32,16 +33,19 @@ public class AuthService {
     private final RoleRepository roleRepository;
     private final AuthMapper authMapper;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     public AuthService(final UserRepository userRepository,
                        final RoleRepository roleRepository,
                        final AuthMapper authMapper,
-                       final UserMapper userMapper) {
+                       final UserMapper userMapper,
+                       final PasswordEncoder passwordEncoder) {
 
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.authMapper = authMapper;
         this.userMapper = userMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public SignupResponse signup(final SignupRequest request) {
@@ -59,6 +63,7 @@ public class AuthService {
         }
 
         final UserEntity userEntity = userMapper.toEntity(request);
+        userEntity.setPassword(passwordEncoder.encode(request.getPassword()));
 
         final RoleEntity consumerRole = roleRepository.findByName("CONSUMER")
                 .orElseThrow(() -> {
@@ -75,7 +80,8 @@ public class AuthService {
         return authMapper.toSignupResponse(savedUserEntity);
     }
 
-    public LoginResponse login(final LoginRequest request, final HttpServletRequest httpRequest) {
+    public LoginResponse login(final LoginRequest request,
+                               final HttpServletRequest httpRequest) {
 
         LOGGER.info("Login attempt for email={}", request.getEmail());
 
@@ -85,12 +91,12 @@ public class AuthService {
                     return new InvalidCredentialsException("Invalid email or password");
                 });
 
-        if (!userEntity.getPassword().equals(request.getPassword())) {
+        if (!passwordEncoder.matches(request.getPassword(), userEntity.getPassword())) {
             LOGGER.warn("Login failed, incorrect password for email={}", request.getEmail());
             throw new InvalidCredentialsException("Invalid email or password");
         }
 
-        final var authorities = userEntity.getRoles()
+        final  var authorities = userEntity.getRoles()
                 .stream()
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
                 .toList();

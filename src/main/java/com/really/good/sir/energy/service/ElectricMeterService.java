@@ -7,6 +7,7 @@ import com.really.good.sir.energy.dto.response.ElectricMeterTypeResponse;
 import com.really.good.sir.energy.entity.ApartmentEntity;
 import com.really.good.sir.energy.entity.ElectricMeterEntity;
 import com.really.good.sir.energy.entity.ElectricMeterTypeEntity;
+import com.really.good.sir.energy.exception.ApartmentAccessDeniedException;
 import com.really.good.sir.energy.exception.ApartmentNotFoundException;
 import com.really.good.sir.energy.exception.ElectricMeterNotFoundException;
 import com.really.good.sir.energy.exception.MeterTypeNotFoundException;
@@ -77,7 +78,7 @@ public class ElectricMeterService {
         final ApartmentEntity apartment = apartmentRepository.findById(apartmentId)
                 .orElseThrow(() -> new ApartmentNotFoundException(apartmentId));
 
-        final  ElectricMeterEntity meter = meterRepository.findById(request.getMeterId())
+        final ElectricMeterEntity meter = meterRepository.findById(request.getMeterId())
                 .orElseThrow(() -> new ElectricMeterNotFoundException(request.getMeterId()));
 
         meter.setApartment(apartment);
@@ -108,6 +109,22 @@ public class ElectricMeterService {
     }
 
     public ElectricMeterResponse getAssignedMeter(final Long apartmentId) {
+        final ElectricMeterEntity meter = meterRepository.findByApartmentId(apartmentId)
+                .orElseThrow(() -> new ElectricMeterNotFoundException(apartmentId));
+
+        return electricMeterMapper.toResponse(meter);
+    }
+
+    public ElectricMeterResponse getOwnedAssignedMeter(final Long apartmentId, final String requesterEmail) {
+
+        final ApartmentEntity apartment = apartmentRepository.findById(apartmentId)
+                .orElseThrow(() -> new ApartmentNotFoundException(apartmentId));
+
+        if (!apartment.getUser().getEmail().equals(requesterEmail)) {
+            LOGGER.warn("User={} attempted to access apartmentId={} they do not own", requesterEmail, apartmentId);
+            throw new ApartmentAccessDeniedException(apartmentId);
+        }
+
         final ElectricMeterEntity meter = meterRepository.findByApartmentId(apartmentId)
                 .orElseThrow(() -> new ElectricMeterNotFoundException(apartmentId));
 

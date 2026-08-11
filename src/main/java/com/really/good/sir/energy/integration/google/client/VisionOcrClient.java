@@ -53,6 +53,10 @@ public class VisionOcrClient {
 
         final JsonNode response = restTemplate.postForObject(url, httpEntity, JsonNode.class);
 
+        if (response == null) {
+            throw new IllegalStateException("Vision API returned no response body.");
+        }
+
         final List<DetectedTextBlock> blocks = responseMapper.parse(response);
 
         LOGGER.info("Vision API returned {} text block(s)", blocks.size());

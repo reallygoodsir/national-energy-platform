@@ -1,5 +1,6 @@
 package com.really.good.sir.energy.dto.response;
 
+import java.util.Collections;
 import java.util.List;
 
 public class UserResponse {
@@ -29,6 +30,8 @@ public class UserResponse {
     }
 
     public List<String> getRoles() {
-        return roles;
+        return roles == null
+                ? List.of()
+                : Collections.unmodifiableList(roles);
     }
 }

@@ -1,5 +1,6 @@
 package com.really.good.sir.energy.controller;
 
+import com.really.good.sir.energy.annotation.AdminOnly;
 import com.really.good.sir.energy.dto.request.UserLocationRequest;
 import com.really.good.sir.energy.service.UserLocationService;
 import jakarta.validation.Valid;
@@ -20,6 +21,7 @@ public class UserLocationController {
     }
 
     @PostMapping("/{userId}")
+    @AdminOnly
     public void assignLocation(
             @PathVariable final Long userId,
             @Valid @RequestBody final UserLocationRequest request

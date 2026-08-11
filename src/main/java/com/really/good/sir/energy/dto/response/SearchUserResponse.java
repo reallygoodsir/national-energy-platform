@@ -1,5 +1,6 @@
 package com.really.good.sir.energy.dto.response;
 
+import java.util.Collections;
 import java.util.List;
 
 public class SearchUserResponse {
@@ -33,11 +34,15 @@ public class SearchUserResponse {
     }
 
     public List<RoleResponse> getAssignedRoles() {
-        return assignedRoles;
+        return assignedRoles == null
+                ? List.of()
+                : Collections.unmodifiableList(assignedRoles);
     }
 
     public List<RoleResponse> getAvailableRoles() {
-        return availableRoles;
+        return availableRoles == null
+                ? List.of()
+                : Collections.unmodifiableList(availableRoles);
     }
 
     public void setUserId(final Long userId) {

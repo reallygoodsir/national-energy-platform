@@ -9,7 +9,7 @@ public class VisionImageRequest {
 
     public VisionImageRequest(final VisionImage image, final List<VisionFeature> features) {
         this.image = image;
-        this.features = features;
+        this.features = List.copyOf(features);
     }
 
     public VisionImage getImage() {

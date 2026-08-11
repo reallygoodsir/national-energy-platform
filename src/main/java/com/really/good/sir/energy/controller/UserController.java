@@ -1,5 +1,6 @@
 package com.really.good.sir.energy.controller;
 
+import com.really.good.sir.energy.annotation.AdminOnly;
 import com.really.good.sir.energy.dto.request.RoleRequest;
 import com.really.good.sir.energy.dto.response.ApartmentResponse;
 import com.really.good.sir.energy.dto.response.SearchUserResponse;
@@ -29,16 +30,19 @@ public class UserController {
     }
 
     @GetMapping("/search")
+    @AdminOnly
     public SearchUserResponse search(@RequestParam final String value) {
         return userService.search(value);
     }
 
     @PostMapping("/role")
+    @AdminOnly
     public void assignRole(@Valid @RequestBody final RoleRequest request) {
         userService.assignRole(request);
     }
 
     @DeleteMapping("/role")
+    @AdminOnly
     public void removeRole(@Valid @RequestBody final RoleRequest request) {
         userService.removeRole(request);
     }
@@ -49,6 +53,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/apartments")
+    @AdminOnly
     public List<ApartmentResponse> getUserApartments(@PathVariable final Long userId) {
         return userService.getUserApartments(userId);
     }

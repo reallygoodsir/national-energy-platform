@@ -7,7 +7,7 @@ public final class VisionAnnotateRequestBody {
     private final List<VisionImageRequest> requests;
 
     private VisionAnnotateRequestBody(final List<VisionImageRequest> requests) {
-        this.requests = requests;
+        this.requests = List.copyOf(requests);
     }
 
     public static VisionAnnotateRequestBody forTextDetection(final byte[] imageBytes) {
