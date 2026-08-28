@@ -34,6 +34,10 @@ public class ElectricMeterReadingEntity {
         return id;
     }
 
+    public void setId(final Long id) {
+        this.id = id;
+    }
+
     public ElectricMeterEntity getMeter() {
         return meter;
     }

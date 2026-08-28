@@ -37,6 +37,10 @@ public class ElectricMeterEntity {
         return id;
     }
 
+    public void setId(final Long id) {
+        this.id = id;
+    }
+
     public String getSerialNumber() {
         return serialNumber;
     }

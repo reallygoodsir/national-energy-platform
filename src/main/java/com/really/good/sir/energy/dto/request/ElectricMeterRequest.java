@@ -38,4 +38,12 @@ public class ElectricMeterRequest {
     public Long getTypeId() {
         return typeId;
     }
+
+    public void setSerialNumber(final String serialNumber) {
+        this.serialNumber = serialNumber;
+    }
+
+    public void setTypeId(final Long typeId) {
+        this.typeId = typeId;
+    }
 }

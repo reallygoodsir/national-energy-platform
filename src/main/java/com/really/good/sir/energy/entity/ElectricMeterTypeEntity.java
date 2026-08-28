@@ -18,6 +18,10 @@ public class ElectricMeterTypeEntity {
     @Column(nullable = false, unique = true)
     private String name;
 
+    public void setId(final Long id) {
+        this.id = id;
+    }
+
     public Long getId() {
         return id;
     }
